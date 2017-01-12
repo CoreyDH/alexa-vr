@@ -68,6 +68,7 @@ function shuffle (arr) {
 
 
 // Web API
+router.get('/', (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
 
 

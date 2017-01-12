@@ -2,8 +2,8 @@
 
 // Modules
 const express        = require('express'),
-      exphbs         = require('express-handlebars'),
       bodyParser     = require('body-parser'),
+      logger         = require('morgan'),
       session        = require('express-session'),
       SequelizeStore = require('connect-session-sequelize')(session.Store),
       passport       = require('passport'),
@@ -12,23 +12,19 @@ const express        = require('express'),
       // Local dependencies
       routes = require('./controllers/controller.js'),
       models = require('./models'),
-      seeder = require('./seeders'),
 
       // Const vars
       app  = express(),
-      hbs  = exphbs.create({ defaultLayout: 'main', extname: '.hbs' }),
       PORT = process.env.PORT || 3000;
-
-// Handlebars init
-app.engine('.hbs', hbs.engine);
-app.set('view engine', '.hbs');
-if (process.env.PORT) app.enable('view cache');  // Disable view cache for local testing
 
 // Body parser init
 app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
+
+// Run Morgan for Logging
+app.use(logger('dev'));
 
 // Passport init
 if (process.env.AMAZON_CLIENT_ID) {
