@@ -15,7 +15,13 @@ const express        = require('express'),
 
       // Const vars
       app  = express(),
-      PORT = process.env.PORT || 3000;
+      PORT = process.env.PORT || 3000,
+
+      // Handlebars
+      exphbs  = require('express-handlebars');
+
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
 
 // Body parser init
 app.use(bodyParser.json());
@@ -28,7 +34,7 @@ app.use(logger('dev'));
 
 // Passport init
 if (process.env.AMAZON_CLIENT_ID) {
-  
+
   // MySQL session storage
   app.use(session(
     {
@@ -53,15 +59,15 @@ if (process.env.AMAZON_CLIENT_ID) {
       callbackURL: "https://alexaquiz.herokuapp.com/auth/amazon/callback"
     },
     (accessToken, refreshToken, profile, done) => {  // Executed when user data is returned from Amazon
-      models.User.findOrCreate({ 
+      models.User.findOrCreate({
         where: { AmazonId: profile.id }
       }).spread((user, wasCreated) => {
         if (!user) return done(null, false);
 
         else {
-          user.update({ displayName: profile.displayName }).then(user => 
+          user.update({ displayName: profile.displayName }).then(user =>
             done(null, user)
-          )
+          );
         }
       });
     }
@@ -69,16 +75,16 @@ if (process.env.AMAZON_CLIENT_ID) {
 
   // AmazonId is stored when user authenticates
   passport.serializeUser((user, done) => {
-    done(null, user.AmazonId)
+    done(null, user.AmazonId);
   });
 
   // User data pulled out of database on subsequent requests
   passport.deserializeUser((AmazonId, done) => {
     models.User.findOne({ AmazonId: AmazonId }).then(user =>
       done(null, user)
-    )
+    );
   });
-  
+
   app.get('/auth/amazon',          passport.authenticate('amazon', {scope: ['profile']}));
   app.get('/auth/amazon/callback', passport.authenticate('amazon', {successRedirect: '/user_results', failureRedirect: '/'}));
 }
