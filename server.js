@@ -28,8 +28,7 @@ app.use(bodyParser.text());
 // Run Morgan for Logging
 app.use(logger('dev'));
 
-// Socket.IO init
-// server.listen(80);
+// Socket.IO init (pass to express router)
 app.use((req,res,next) => {
   req.io = io;
   next();
@@ -112,6 +111,6 @@ io.on('connection', function (socket) {
 });
 
 // Init server
-app.listen(PORT, function () {
+server.listen(PORT, function () {
   console.log(`App listening on port ${PORT}`);
 });
