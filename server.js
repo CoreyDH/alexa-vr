@@ -29,7 +29,7 @@ app.use(bodyParser.text());
 app.use(logger('dev'));
 
 // Socket.IO init
-server.listen(80);
+// server.listen(80);
 app.use((req,res,next) => {
   req.io = io;
   next();
@@ -105,7 +105,7 @@ app.use('/', routes);
 // Socket.io
 io.on('connection', function (socket) {
   console.log('user connected');
-  
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
