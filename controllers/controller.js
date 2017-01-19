@@ -28,7 +28,7 @@ router.post('/create-user', function (req, res) {
   // Check if email/password exists
   if (req.body.email && req.body.password) {
 
-    // Check if user already exists
+    // Check if user already exists, if not insert into database.
     models.User.findOrCreate({
       where: {
         email: req.body.email
@@ -37,9 +37,11 @@ router.post('/create-user', function (req, res) {
         password: req.body.password
       }
     }).spread(function (account, created) {
-
+      
+      // Check if creation was successful
       if (created) {
         console.log(account.get({ plain: true }), created);
+        res.json(account.get());
       } else {
         res.json({
           error: 'User e-mail already exists in database!'

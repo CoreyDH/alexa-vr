@@ -1,5 +1,5 @@
 'use strict';
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   var User = sequelize.define('User', {
     email: {
       type: DataTypes.STRING,
@@ -13,19 +13,19 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     }
-  }, {
-    classMethods: {
-      associate: function(models) {
-        // associations can be defined here
-        User.hasMany(models.UserPets, { as: 'Pet', onDelete: 'CASCADE' });
-      },
-      hooks: {
-        beforeCreate: function(user, options) {
-          // Hash password here
-          })
+  },
+    {
+      classMethods: {
+        associate: function (models) {
+          // associations can be defined here
+          User.hasMany(models.UserPets, { as: 'Pet', onDelete: 'CASCADE' });
+        },
+        hooks: {
+          beforeCreate: function (user, options) {
+            // Hash password here
+          }
         }
       }
-    }
-  });
+    });
   return User;
 };
