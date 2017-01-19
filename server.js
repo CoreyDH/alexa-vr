@@ -2,8 +2,11 @@
 
 // Modules
 const express        = require('express'),
+      app            = express(),
       bodyParser     = require('body-parser'),
       logger         = require('morgan'),
+      server         = require('http').Server(app),
+      io             = require('socket.io')(server),
       session        = require('express-session'),
       SequelizeStore = require('connect-session-sequelize')(session.Store),
       passport       = require('passport'),
@@ -14,7 +17,6 @@ const express        = require('express'),
       models = require('./models'),
 
       // Const vars
-      app  = express(),
       PORT = process.env.PORT || 3000;
 
 // Body parser init
@@ -25,6 +27,13 @@ app.use(bodyParser.text());
 
 // Run Morgan for Logging
 app.use(logger('dev'));
+
+// Socket.IO init
+server.listen(80);
+app.use((req,res,next) => {
+  req.io = io;
+  next();
+});
 
 // Passport init
 if (process.env.AMAZON_CLIENT_ID) {
@@ -92,6 +101,15 @@ app.use(express.static(process.cwd() + '/public'));
 
 // Controller routes
 app.use('/', routes);
+
+// Socket.io
+io.on('connection', function (socket) {
+  console.log('user connected');
+  
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+});
 
 // Init server
 app.listen(PORT, function () {

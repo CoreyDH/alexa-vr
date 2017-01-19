@@ -70,6 +70,14 @@ function shuffle (arr) {
 // Web API
 router.get('/', (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
+router.get('/socket', (req, res) => {
+  req.io.emit('news', { hello: 'world' });
+  req.io.on('my other event', function (data) {
+    console.log(data);
+  });
+  res.json({ status: 'OK' });
+});
+
 
 
 module.exports = router;

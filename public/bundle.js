@@ -57,15 +57,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	// Render Main Component
-	_reactDom2.default.render(_react2.default.createElement(
-	  'div',
-	  { className: 'main-container' },
-	  _react2.default.createElement(
-	    'div',
-	    null,
-	    'Hello World!'
-	  )
-	), document.getElementById('app'));
+	_reactDom2.default.render(_react2.default.createElement('div', { className: 'main-container' }), document.getElementById('app'));
 
 /***/ },
 /* 1 */
