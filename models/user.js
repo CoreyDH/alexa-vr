@@ -1,4 +1,18 @@
 'use strict';
+
+const bcrypt = require('bcryptjs'),
+  SALT_WORK_FACTOR = 10;
+
+function getHash(instance, options) {
+  // Hash password here
+  console.log('Hashing password');
+
+  const salt = bcrypt.genSaltSync(SALT_WORK_FACTOR),
+    hash = bcrypt.hashSync(instance.password, salt);
+
+  instance.password = hash;
+}
+
 module.exports = function (sequelize, DataTypes) {
   var User = sequelize.define('User', {
     email: {
@@ -19,12 +33,20 @@ module.exports = function (sequelize, DataTypes) {
         associate: function (models) {
           // associations can be defined here
           User.hasMany(models.UserPets, { as: 'Pet', onDelete: 'CASCADE' });
-        },
-        hooks: {
-          beforeCreate: function (user, options) {
-            // Hash password here
-          }
         }
+      },
+      instanceMethods: {
+        generateHash: function (password, callback) {
+          bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
+            bcrypt.hash(password, salt, callback);
+          });
+        },
+        validatePW: function (password, callback) {
+          bcrypt.compare(password, this.password, callback)
+        }
+      },
+      hooks: {
+        beforeCreate: getHash,
       }
     });
   return User;

@@ -2,6 +2,7 @@
 
 // Modules
 const express        = require('express'),
+      expressValidator = require('express-validator'),
       bodyParser     = require('body-parser'),
       logger         = require('morgan'),
       session        = require('express-session'),
@@ -10,7 +11,7 @@ const express        = require('express'),
       AmazonStrategy = require('passport-amazon').Strategy,
 
       // Local dependencies
-      routes = require('./controllers/controller.js'),
+      routes = require('./controllers/index.js'),
       models = require('./models'),
 
       // Const vars
@@ -28,6 +29,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
+
+app.use(expressValidator({
+  errorFormatter: function(param, msg, value) {
+      var namespace = param.split('.')
+      , root    = namespace.shift()
+      , formParam = root;
+
+    while(namespace.length) {
+      formParam += '[' + namespace.shift() + ']';
+    }
+    return {
+      param : formParam,
+      msg   : msg,
+      value : value
+    };
+  }
+}));
 
 // Run Morgan for Logging
 app.use(logger('dev'));

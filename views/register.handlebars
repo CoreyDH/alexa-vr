@@ -1,4 +1,10 @@
-<form class="form-control" action="/create-user" method="post">
+<h1>Register</h1>
+{{#if errors}}
+  {{#each errors}}
+    <div class="alert alert-danger">{{msg}}</div>
+  {{/each}}
+{{/if}}
+<form class="form-control" action="/register" method="post">
   E-mail:   <input type="text" name="email" value="" placeholder="Enter your email here."><br>
   Password: <input type="password" name="password" value=""><br>
   Confirm Password: <input type="password" name="password2" value=""><br>
