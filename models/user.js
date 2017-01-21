@@ -41,7 +41,7 @@ module.exports = function (sequelize, DataTypes) {
             bcrypt.hash(password, salt, callback);
           });
         },
-        validatePW: function (password, callback) {
+        validPassword: function (password, callback) {
           bcrypt.compare(password, this.password, callback)
         }
       },

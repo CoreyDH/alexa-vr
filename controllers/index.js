@@ -10,44 +10,12 @@ const express = require('express'),
   // Const vars
   router = express.Router();
 
-// Array.prototype.indexOfProp: function (value, prop1, prop2) {
-//   for (var i = 0; i < this.length; i++) {
-//     if (prop2) if (this[i] && this[i][prop1][prop2] === value) return i;
-//     else if (this[i] && this[i][prop1] === value) return i;
-//   }
-//
-//   return -1;
-// },
 
-// passport.use(new LocalStrategy({
-//   usernameField: 'email'
-// },
-//   function (username, password, done) {
-//     User.findOne({ username: username }, function (err, user) {
-//       if (err) { return done(err); }
-//       if (!user) {
-//         return done(null, false, { message: 'Incorrect username.' });
-//       }
-//       // if (!user.validPassword(password)) {
-//       //   return done(null, false, { message: 'Incorrect password.' });
-//       // }
-//       return done(null, user);
-//     });
-//   }
-// ));
+// Routes
+router.get('/', (req, res) => {
+  res.render('index');
+});
 
-// passport.serializeUser(function(user, done) {
-//   done(null, user.id);
-// });
-
-// passport.deserializeUser(function(id, done) {
-//   User.findById(id, function(err, user) {
-//     done(err, user);
-//   });
-// });
-
-// Web API
-router.get('/', (req, res) => res.render('index'));
 router.get('/login', (req, res) => res.render('login'));
 router.get('/register', (req, res) => res.render('register'));
 
@@ -57,7 +25,7 @@ router.post('/register', function (req, res) {
   const email = req.body.email,
     password = req.body.password,
     password2 = req.body.password2;
-  
+
   // Validate form fields
   req.checkBody('email', 'E-mail cannot be empty!').notEmpty();
   req.checkBody('email', 'E-mail is not valid.').isEmail();
@@ -98,13 +66,56 @@ router.post('/register', function (req, res) {
 
 });
 
-// // Verify login
-// router.post('/login',
-//   passport.authenticate('local', {
-//     successRedirect: '/',
-//     failureRedirect: '/login',
-//     failureFlash: true
-//   })
-// );
+// Passport Strategy
+passport.use(new LocalStrategy({
+  usernameField: 'email'
+},
+  function (username, password, done) {
+    models.User.findOne({
+      where: {
+        email: username
+      }
+    }).then(function (user) {
+      // if (err) { return done(err); }
+
+      console.log('Hit strat', user);
+
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+
+      user.validPassword(password, function (err, isMatch) {
+        if (err) throw err;
+
+        console.log('Match check', isMatch);
+
+        if (isMatch) {
+          return done(null, user);
+        } else {
+          return done(null, false, { message: 'Incorrect password.' });
+        }
+      });
+    });
+  }
+));
+
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+  models.User.findOne({ where: { id: id } }).then(function (user) {
+    done(null, user);
+  });
+});
+
+// Verify login
+router.post('/login',
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: false
+  })
+);
 
 module.exports = router;
