@@ -6,8 +6,6 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   logger = require('morgan'),
   session = require('express-session'),
-  server = require('http').Server(app),
-  io = require('socket.io')(server),
   flash = require('connect-flash'),
   SequelizeStore = require('connect-session-sequelize')(session.Store),
   passport = require('passport'),
@@ -19,6 +17,8 @@ const express = require('express'),
 
   // Const vars
   app = express(),
+  server = require('http').Server(app),
+  io = require('socket.io')(server),
   PORT = process.env.PORT || 3000,
 
   // Handlebars
