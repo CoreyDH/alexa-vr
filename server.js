@@ -1,23 +1,31 @@
 'use strict';
 
 // Modules
-const express        = require('express'),
-      app            = express(),
-      bodyParser     = require('body-parser'),
-      logger         = require('morgan'),
-      server         = require('http').Server(app),
-      io             = require('socket.io')(server),
-      session        = require('express-session'),
-      SequelizeStore = require('connect-session-sequelize')(session.Store),
-      passport       = require('passport'),
-      AmazonStrategy = require('passport-amazon').Strategy,
+const express = require('express'),
+  expressValidator = require('express-validator'),
+  bodyParser = require('body-parser'),
+  logger = require('morgan'),
+  session = require('express-session'),
+  flash = require('connect-flash'),
+  SequelizeStore = require('connect-session-sequelize')(session.Store),
+  passport = require('passport'),
 
-      // Local dependencies
-      routes = require('./controllers/controller.js'),
-      models = require('./models'),
+  // Local dependencies
+  routes = require('./controllers/index.js'),
+  amazonRoutes = require('./controllers/amazon.js'),
+  models = require('./models'),
 
-      // Const vars
-      PORT = process.env.PORT || 3000;
+  // Const vars
+  app = express(),
+  server = require('http').Server(app),
+  io = require('socket.io')(server),
+  PORT = process.env.PORT || 3000,
+
+  // Handlebars
+  exphbs = require('express-handlebars');
+
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
 
 // Body parser init
 app.use(bodyParser.json());
@@ -25,19 +33,36 @@ app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 
+app.use(expressValidator({
+  errorFormatter: function (param, msg, value) {
+    var namespace = param.split('.')
+      , root = namespace.shift()
+      , formParam = root;
+
+    while (namespace.length) {
+      formParam += '[' + namespace.shift() + ']';
+    }
+    return {
+      param: formParam,
+      msg: msg,
+      value: value
+    };
+  }
+}));
+
 // Run Morgan for Logging
 app.use(logger('dev'));
 
 // Socket.IO init (pass to express router)
-app.use((req,res,next) => {
+app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
 // Passport init
 if (process.env.AMAZON_CLIENT_ID) {
-  
-  // MySQL session storage
+
+  // Amazon Session
   app.use(session(
     {
       secret: process.env.SESSION_SECRET,
@@ -49,47 +74,32 @@ if (process.env.AMAZON_CLIENT_ID) {
       })
     }
   ));
+} else {
 
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  // Authentication strategy
-  passport.use(new AmazonStrategy(
+  // Local test session
+  app.use(session(
     {
-      clientID: process.env.AMAZON_CLIENT_ID,
-      clientSecret:  process.env.AMAZON_CLIENT_SECRET,
-      callbackURL: "https://alexaquiz.herokuapp.com/auth/amazon/callback"
-    },
-    (accessToken, refreshToken, profile, done) => {  // Executed when user data is returned from Amazon
-      models.User.findOrCreate({ 
-        where: { AmazonId: profile.id }
-      }).spread((user, wasCreated) => {
-        if (!user) return done(null, false);
-
-        else {
-          user.update({ displayName: profile.displayName }).then(user => 
-            done(null, user)
-          )
-        }
-      });
+      secret: 'secret',
+      cookie: { maxAge: 3600000 },
+      resave: true,
+      saveUninitialized: true
     }
   ));
 
-  // AmazonId is stored when user authenticates
-  passport.serializeUser((user, done) => {
-    done(null, user.AmazonId)
-  });
-
-  // User data pulled out of database on subsequent requests
-  passport.deserializeUser((AmazonId, done) => {
-    models.User.findOne({ AmazonId: AmazonId }).then(user =>
-      done(null, user)
-    )
-  });
-  
-  app.get('/auth/amazon',          passport.authenticate('amazon', {scope: ['profile']}));
-  app.get('/auth/amazon/callback', passport.authenticate('amazon', {successRedirect: '/user_results', failureRedirect: '/'}));
 }
+
+// Connect Flash
+// app.use(flash());
+
+// app.use(function(req, res, next) {
+//   res.locals.success_msg = req.flash('success_msg');
+//   res.locals.error_msg = req.flash('error_msg');
+//   res.locals.error = req.flash('error');
+// });
+
+// Passport init
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Sequelize init
 // seeder(models);
@@ -100,12 +110,13 @@ app.use(express.static(process.cwd() + '/public'));
 
 // Controller routes
 app.use('/', routes);
+app.use('/amazon', amazonRoutes);
 
 // Socket.io
 io.on('connection', function (socket) {
   console.log('user connected');
 
-  socket.on('disconnect', function(){
+  socket.on('disconnect', function () {
     console.log('user disconnected');
   });
 });
