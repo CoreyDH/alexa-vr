@@ -12,7 +12,9 @@ const express = require('express'),
 
   // Local dependencies
   routes = require('./controllers/index.js'),
-  amazonRoutes = require('./controllers/amazon.js'),
+  routesAccount = require('./controllers/account.js'),
+  routesAmazon = require('./controllers/amazon.js'),
+  routesSockets = require('./controllers/sockets.js'),
   models = require('./models'),
 
   // Const vars
@@ -110,7 +112,28 @@ app.use(express.static(process.cwd() + '/public'));
 
 // Controller routes
 app.use('/', routes);
-app.use('/amazon', amazonRoutes);
+app.use('/account', routesAccount);
+app.use('/amazon', routesAmazon);
+app.use('/sockets', routesSockets);
+
+app.use(function(req, res, next){
+  res.status(404);
+
+  // respond with html page
+  if (req.accepts('html')) {
+    res.render('404', { url: req.url });
+    return;
+  }
+
+  // respond with json
+  if (req.accepts('json')) {
+    res.send({ error: 'Not found' });
+    return;
+  }
+
+  // default to plain-text. send()
+  res.type('txt').send('Not found');
+});
 
 // Socket.io
 io.on('connection', function (socket) {
