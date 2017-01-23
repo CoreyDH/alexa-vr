@@ -1,27 +1,22 @@
 module.exports = {
-
-  // This code will be compiled by webpack according to the babel specifications
   entry: "./app/app.js",
-
-  // The plain compiled Javascript will be output into this file
   output: {
     filename: "public/assets/js/bundle.js"
   },
-
-
-  // This will be what we do
   module: {
+    noParse: [
+      /node_modules\/aframe\/dist\/aframe.js/,
+    ],
     loaders: [
       {
         test: /\.jsx?$/,
-        exclude: /(node_moduled|bower_components)/,
+        exclude: /(node_modules|bower_components)/,
         loader: 'babel',
         query: {
-          // These are the specific transformations we'll be using.
           presets: ['react', 'es2015']
         }
       }
     ]
-  }
-
+  },
+  devtool: '#eval-source-map'
 }
