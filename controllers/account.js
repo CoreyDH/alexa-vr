@@ -125,9 +125,7 @@ router.post('/login',
         successRedirect: '/account',
         failureRedirect: '/account/login',
         failureFlash: false
-    }), function (req, res) {
-        console.log('what');
-    }
+    })
 );
 
 module.exports = router;

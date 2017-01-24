@@ -14,10 +14,10 @@ module.exports = function (sequelize, DataTypes) {
       classMethods: {
         associate: function (models) {
           // associations can be defined here
-          Pets.belongsTo(models.Moves, { foreignKey: 'move1' });
-          Pets.belongsTo(models.Moves, { foreignKey: 'move2' });
-          Pets.belongsTo(models.Moves, { foreignKey: 'move3' });
-          Pets.belongsTo(models.Moves, { foreignKey: 'move4' });
+          Pets.belongsTo(models.Moves, { as: 'petMove1', foreignKey: 'move1' });
+          Pets.belongsTo(models.Moves, { as: 'petMove2', foreignKey: 'move2' });
+          Pets.belongsTo(models.Moves, { as: 'petMove3', foreignKey: 'move3' });
+          Pets.belongsTo(models.Moves, { as: 'petMove4', foreignKey: 'move4' });
         }
       }
     });

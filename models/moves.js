@@ -1,7 +1,11 @@
 'use strict';
 module.exports = function (sequelize, DataTypes) {
   var Moves = sequelize.define('Moves', {
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
     type1: DataTypes.STRING,
     type2: DataTypes.STRING,
     type3: DataTypes.STRING,

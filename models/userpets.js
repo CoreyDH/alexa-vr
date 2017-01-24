@@ -11,10 +11,10 @@ module.exports = function (sequelize, DataTypes) {
         associate: function (models) {
           // associations can be defined here
           UserPets.belongsTo(models.Pets, { onDelete: 'CASCADE' });
-          UserPets.belongsTo(models.Moves, { foreignKey: 'move1' });
-          UserPets.belongsTo(models.Moves, { foreignKey: 'move2' });
-          UserPets.belongsTo(models.Moves, { foreignKey: 'move3' });
-          UserPets.belongsTo(models.Moves, { foreignKey: 'move4' });
+          UserPets.belongsTo(models.Moves, { as: 'userPetMove1', foreignKey: 'move1' });
+          UserPets.belongsTo(models.Moves, { as: 'userPetMove2', foreignKey: 'move2' });
+          UserPets.belongsTo(models.Moves, { as: 'userPetMove3', foreignKey: 'move3' });
+          UserPets.belongsTo(models.Moves, { as: 'userPetMove4', foreignKey: 'move4' });
         }
       }
     });
