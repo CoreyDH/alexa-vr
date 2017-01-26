@@ -11,10 +11,6 @@ const express = require('express'),
   passport = require('passport'),
 
   // Local dependencies
-  routes = require('./controllers/index.js'),
-  routesAccount = require('./controllers/account.js'),
-  routesAmazon = require('./controllers/amazon.js'),
-  routesSockets = require('./controllers/sockets.js'),
   models = require('./models'),
 
   // Const vars
@@ -104,17 +100,27 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Sequelize init
-// seeder(models);
-models.sequelize.sync();
+models.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
+.then(function(){
+	return models.sequelize.sync({force:true})
+})
+// models.sequelize.sync();
 
 // Route for static content
 app.use(express.static(process.cwd() + '/public'));
 
 // Controller routes
+const routes = require('./controllers/index.js'),
+      routesAccount = require('./controllers/account.js'),
+      routesAmazon = require('./controllers/amazon.js'),
+      routesSockets = require('./controllers/sockets.js'),
+      routesSeeds = require('./controllers/seeds.js');
+
 app.use('/', routes);
 app.use('/account', routesAccount);
 app.use('/amazon', routesAmazon);
 app.use('/sockets', routesSockets);
+app.use('/seeds', routesSeeds);
 
 app.use(function(req, res, next){
   res.status(404);
