@@ -110,17 +110,21 @@ models.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
 app.use(express.static(process.cwd() + '/public'));
 
 // Controller routes
-const routes = require('./controllers/index.js'),
-      routesAccount = require('./controllers/account.js'),
-      routesAmazon = require('./controllers/amazon.js'),
-      routesSockets = require('./controllers/sockets.js'),
-      routesSeeds = require('./controllers/seeds.js');
+const routes = {
+      index: require('./controllers/index.js'),
+      account: require('./controllers/account.js'),
+      amazon: require('./controllers/amazon.js'),
+      pets: require('./controllers/pets.js'),
+      sockets: require('./controllers/sockets.js'),
+      seeds: require('./controllers/seeds.js')
+};
 
-app.use('/', routes);
-app.use('/account', routesAccount);
-app.use('/amazon', routesAmazon);
-app.use('/sockets', routesSockets);
-app.use('/seeds', routesSeeds);
+app.use('/', routes.index);
+app.use('/account', routes.account);
+app.use('/amazon', routes.amazon);
+app.use('/sockets', routes.sockets);
+app.use('/pets', routes.pets);
+app.use('/seeds', routes.seeds);
 
 app.use(function(req, res, next){
   res.status(404);

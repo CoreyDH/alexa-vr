@@ -28,8 +28,8 @@ router.get('/', (req, res) => {
 
 });
 
-router.get('/login', (req, res) => res.render('login'));
-router.get('/register', (req, res) => res.render('register'));
+// router.get('/login', (req, res) => res.render('login'));
+// router.get('/register', (req, res) => res.render('register'));
 
 // Create User
 router.post('/register', function (req, res) {
