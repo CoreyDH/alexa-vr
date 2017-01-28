@@ -14,6 +14,8 @@ const express = require('express'),
 // Routes
 router.get('/', (req, res) => {
 
+    console.log('User', req.user);
+
     if (req.user) {
 
         const user = req.user.dataValues;
@@ -31,14 +33,30 @@ router.get('/', (req, res) => {
 // router.get('/login', (req, res) => res.render('login'));
 // router.get('/register', (req, res) => res.render('register'));
 
+// Check if user is logged in
+router.get('/status', (req, res) => {
+    if (req.user) {
+        res.json({
+            login: {
+                username: req.user.username,
+                email: req.user.email
+            }
+        });
+    } else {
+        res.send(false);
+    }
+});
+
 // Create User
 router.post('/register', function (req, res) {
 
-    const email = req.body.email,
+    const username = req.body.username,
+        email = req.body.email,
         password = req.body.password,
         password2 = req.body.password2;
 
     // Validate form fields
+    req.checkBody('username', 'Username cannot be empty!').notEmpty();
     req.checkBody('email', 'E-mail cannot be empty!').notEmpty();
     req.checkBody('email', 'E-mail is not valid.').isEmail();
     req.checkBody('password', 'Password cannot be empty!').notEmpty();
@@ -53,9 +71,10 @@ router.post('/register', function (req, res) {
         models.User.sync().then(function () {
             models.User.findOrCreate({
                 where: {
-                    email: email
+                    username: username
                 },
                 defaults: {
+                    email: email,
                     password: password
                 }
             }).spread(function (account, created) {
@@ -79,13 +98,11 @@ router.post('/register', function (req, res) {
 });
 
 // Passport Strategy
-passport.use(new LocalStrategy({
-    usernameField: 'email'
-},
+passport.use(new LocalStrategy(
     function (username, password, done) {
         models.User.findOne({
             where: {
-                email: username
+                username: username
             }
         }).then(function (user) {
             // if (err) { return done(err); }
@@ -122,10 +139,16 @@ passport.deserializeUser(function (id, done) {
 // Verify login
 router.post('/login',
     passport.authenticate('local', {
-        successRedirect: '/account',
-        failureRedirect: '/account/login',
+        successRedirect: '/#/account',
+        failureRedirect: '/#/login',
         failureFlash: false
     })
 );
+
+// Log out
+router.get('/logout', (req, res) => {
+    req.logOut();
+    res.redirect('/');
+});
 
 module.exports = router;

@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 import { FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap';
 
 export default class LoginForm extends React.Component {
     render() {
         return (
             <form action="/account/login" method="post">
-                <FormGroup controlId="email">
-                    <ControlLabel>E-mail: </ControlLabel>
-                    <FormControl type="text" name="email" placeholder="Enter your email here."></FormControl>
+                <FormGroup controlId="username">
+                    <ControlLabel>Username: </ControlLabel>
+                    <FormControl type="text" name="username" placeholder="Create a username."></FormControl>
                 </FormGroup>
                 <FormGroup controlId="password">
                     <ControlLabel>Password: </ControlLabel>

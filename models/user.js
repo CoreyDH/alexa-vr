@@ -15,6 +15,15 @@ function getHash(instance, options) {
 
 module.exports = function (sequelize, DataTypes) {
   var User = sequelize.define('User', {
+    username: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        is: ["^[a-zA-Z0-9_]+$",'i'],
+        isLowercase: true
+      }
+    },
     email: {
       type: DataTypes.STRING,
       unique: true,

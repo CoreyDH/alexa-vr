@@ -1,11 +1,12 @@
-import React from "react";
+import React from 'react';
 
 import Header from "../components/Header";
 
 export default class Layout extends React.Component {
+
     render() {
         return (
-            <div className='main-container'>
+            <div className="wrapper">
                 <Header />
                 <div className="container">
                     <div className="row">
