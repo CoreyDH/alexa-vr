@@ -82,7 +82,7 @@ router.post('/register', function (req, res) {
                 // Check if creation was successful
                 if (created) {
                     //   console.log(account.get({ plain: true }), created);
-                    res.json(account.get());
+                    res.redirect('/#/login');
                 } else {
                     res.render('register', {
                         errors: [{
@@ -148,7 +148,67 @@ router.post('/login',
 // Log out
 router.get('/logout', (req, res) => {
     req.logOut();
-    res.redirect('/');
+});
+
+// Check if user is logged in
+router.get('/pets', (req, res) => {
+    if (req.user) {
+        models.User.findOne({
+            where: {
+                username: req.user.username
+            }
+        }).then((user) => {
+
+            models.UserPets.findAll({
+                where: {
+                    UserId: user.id
+                }
+            }).then((userPets) => {
+
+                console.log('User pets for ', user.username, ' pets: ', userPets);
+                res.json(userPets);
+            })
+
+        });
+    } else {
+        res.send(false);
+    }
+});
+
+// Check if user is logged in
+router.post('/add-pet', (req, res) => {
+
+    if (req.user) {
+
+        const addPet = {
+            name: req.body.pet
+        };
+
+        models.User.findOne({
+            where: {
+                username: req.user.username
+            }
+        }).then((userInstance) => {
+
+            models.Pets.findOne({
+                where: {
+                    name: addPet.name
+                }
+            }).then((petInstance) => {
+
+                console.log('pet instance', petInstance);
+                models.UserPets.create(petInstance.dataValues).then((userPetInstance) => {
+                    return userInstance.addPet(userPetInstance);
+                }).then((added) => {
+                    console.log(added);
+                    res.json(added);
+                });
+            })
+
+        });
+    } else {
+        res.send(false);
+    }
 });
 
 module.exports = router;

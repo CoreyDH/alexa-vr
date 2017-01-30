@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router';
+import { Button } from 'react-bootstrap';
 
 function getUserAccount() {
     return axios.get('/account')
@@ -7,9 +9,9 @@ function getUserAccount() {
 export default class Pets extends React.Component {
     render() {
         return (
-          <div className="pet-holder">
-
-          </div>  
+          <li className="pet">
+            {this.props.userPet.name} - <Link to="aframe">Battle!</Link>
+          </li>  
         );
     }
 }

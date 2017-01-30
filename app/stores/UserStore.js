@@ -1,25 +1,40 @@
 import { EventEmitter } from 'events';
-import ajax from '../../helpers/ajax.js';
+import dispatcher from '../dispatcher';
+
 
 class UserStore extends EventEmitter {
     constructor() {
         super();
 
         this.loggedIn = false;
-        ajax.checkLogin().then((status) => {
-            console.log('Login status', status);
-            if(status) {
-                this.loggedIn = status;
-                this.emit('change');
-            }
-        });
-        
+        this.userPets = false;
     }
 
     isLoggedIn() {
         return this.loggedIn;
     }
+
+    getPets() {
+        return this.userPets;
+    }
+
+    handleActions(action) {
+        console.log('UserStore received an action', action);
+
+        switch (action.type) {
+            case 'CHECK_STATUS':
+                this.loggedIn = action.status;
+                this.emit('change');
+                break;
+            case 'SHOW_PETS':
+                this.userPets = action.userPets;
+                this.emit('petChange');
+                break;
+        }
+    }
 }
 
 const userStore = new UserStore;
+dispatcher.register(userStore.handleActions.bind(userStore));
+
 export default userStore;

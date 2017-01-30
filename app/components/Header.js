@@ -2,39 +2,53 @@ import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Nav, Navbar, NavItem, NavDropdown, MenuItem, FormGroup, FormControl, Button } from 'react-bootstrap';
 
+import * as UserActions from '../actions/UserActions';
 import UserStore from "../stores/UserStore";
 
 export default class Layout extends React.Component {
 
     constructor() {
         super();
+
+        this.getStatus = this.getStatus.bind(this);
         this.state = {
-            loggedIn: false
+            loggedIn: UserActions.checkStatus()
         }
     }
 
     componentWillMount() {
+        UserStore.on('change', this.getStatus);
+        console.log('count', UserStore.listenerCount('change'));
+    }
 
-        console.log('hit mount');
-        UserStore.on('change', () => {
-            this.setState({
+    componentWillUnmount() {
+        UserStore.removeListener('change', this.getStatus)
+    }
+
+    getStatus() {
+
+        console.log('emitted change received');
+        this.setState({
                 loggedIn: UserStore.isLoggedIn()
-            });
-        })
+        });
+    }
+
+    logOut() {
+        UserActions.logOut();
     }
 
     render() {
 
         let userLinks = null;
 
-        console.log('login state', this.state.loggedIn.responseText);
+        console.log('login state', this.state.loggedIn);
 
-        if (this.state.loggedIn.data) {
+        if (this.state.loggedIn) {
             userLinks = (
                 <Nav pullRight>
                     <NavDropdown title="My Account" id="my-account">
                         <LinkContainer to="account"><MenuItem>Dashboard</MenuItem></LinkContainer>
-                        <LinkContainer to="logout"><MenuItem>Log Out</MenuItem></LinkContainer>
+                        <MenuItem onSelect={this.logOut.bind(this)}>Log Out</MenuItem>
                     </NavDropdown>
                 </Nav>);
         } else {

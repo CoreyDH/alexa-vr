@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Logout from './pages/Logout';
 import Register from './pages/Register';
 import Account from './pages/Account';
+import Aframe from './pages/Aframe';
 
 const app = document.getElementById('app');
 
@@ -23,6 +24,7 @@ ReactDOM.render(
       <Route path="logout" name="logout" component={Logout}></Route>
       <Route path="register" name="register" component={Register}></Route>
       <Route path="account" name="account" component={Account}></Route>
+      <Route path="aframe" name="aframe" component={Aframe}></Route>
     </Route>
   </Router>,
   app);

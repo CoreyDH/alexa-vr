@@ -31,19 +31,46 @@ router.get('/:pet?', (req, res) => {
 router.post('/save', (req, res) => {
 
     if (req.user && req.body.pet) {
-        const user = req.user.dataValues,
-            pet = req.body.pet;
+        const pet = req.body.pet;
         
         models.User.findOne({
             where: {
-                email: user.email
+                email: req.user.email
             }
-        }).then((account) => {
+        }).then((userInstance) => {
             // TODO Find requested pet and add to User key
 
+            models.Pets.findOne({
+                where: pet,
+                include: [
+                    { model: models.Moves, as: 'move1' },
+                    { model: models.Moves, as: 'move2' },
+                    { model: models.Moves, as: 'move3' },
+                    { model: models.Moves, as: 'move4' }
+                ]
+            }).then((petInstance) => {
+
+                let userPetEntry = {
+                    name: petInstance.name,
+                    move1_pp: petInstance.move1.pp,
+                    move2_pp: petInstance.move2.pp,
+                    move3_pp: petInstance.move3.pp,
+                    move4_pp: petInstance.move4.pp
+                };
+
+                models.UserPets.create(userPetEntry).then((userPetInstance) => {
+                    userInstance.addPet(userPetInstance)
+                    userPetInstance.setUserMove1(petInstance.move1);
+                    userPetInstance.setUserMove2(petInstance.move2);
+                    userPetInstance.setUserMove3(petInstance.move3);
+                    userPetInstance.setUserMove4(petInstance.move4);
+                    userPetInstance.setPet(petInstance);
+
+                    res.json(userPetInstance);
+                });
+            });
+
         });
-
-
 
     } else {
         res.json({
