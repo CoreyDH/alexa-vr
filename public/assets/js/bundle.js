@@ -48984,7 +48984,7 @@
 	                ' - ',
 	                _react2.default.createElement(
 	                    _reactRouter.Link,
-	                    { to: 'aframe' },
+	                    { to: 'aframe', userPet: this.props.userPet },
 	                    'Battle!'
 	                )
 	            );
@@ -49035,7 +49035,8 @@
 	            return _react2.default.createElement(
 	                "div",
 	                { className: "col-xs-12" },
-	                "Aframe battle."
+	                "Aframe battle. ",
+	                this.props.userPet.name
 	            );
 	        }
 	    }]);

@@ -10,7 +10,7 @@ export default class Pets extends React.Component {
     render() {
         return (
           <li className="pet">
-            {this.props.userPet.name} - <Link to="aframe">Battle!</Link>
+            {this.props.userPet.name} - <Link to="aframe" userPet={this.props.userPet}>Battle!</Link>
           </li>  
         );
     }
