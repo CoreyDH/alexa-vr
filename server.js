@@ -100,11 +100,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Sequelize init
-// models.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
-// .then(function(){
-// 	return models.sequelize.sync({force:true})
-// })
-models.sequelize.sync();
+models.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
+.then(function(){
+	return models.sequelize.sync({force:true})
+})
+// models.sequelize.sync();
 
 // Route for static content
 app.use(express.static(process.cwd() + '/public'));

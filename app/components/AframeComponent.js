@@ -1,32 +1,42 @@
 import React from 'react';
 
-export default class AframeComponent extends React.Component {
+import 'aframe'
+import extras from 'aframe-extras'
+import {Entity, Scene} from 'aframe-react'
+
+extras.loaders.registerAll();
+
+const socket = io();
+
+socket.on('news', function (data) {
+  console.log(data);
+  socket.emit('my other event', { my: 'data' });
+  document.getElementById('cyl').emit('dance');
+});
+
+export default class Aframe extends React.Component {
     render() {
         return (
-            <div>
-            <script
-                src="https://code.jquery.com/jquery-3.1.1.min.js"
-                integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-                crossorigin="anonymous"></script>
-            <script src="https://aframe.io/releases/0.4.0/aframe.min.js"></script>
-            <a-scene>
-                <a-cylinder id="cyl" position="0 0.75 -3" radius="0.3" height="1.5" color="grey">
-                    <a-animation attribute="rotation" dur="10000" fill="forwards" to="180 360 0" begin="dance"></a-animation>
-                </a-cylinder>
-                <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
-                <a-sky color="#ECECEC"></a-sky>
-            </a-scene>
+            <Scene>
+                <a-assets>
+                    <a-asset-item id="bear-obj" src="/assets/obj/bear-obj.obj"></a-asset-item>
+                    <a-asset-item id="bear-mtl" src="/assets/obj/bear-obj.mtl"></a-asset-item>
 
-            <script src="/socket.io/socket.io.js"></script>
-            <script>
-                const socket = io();
-            socket.on('news', function (data) {
-                    console.log(data);
-                socket.emit('my other event', {my: 'data' });
-                $('#cyl')[0].emit('dance');
-            });
-        </script>
-        </div>
+                    <a-asset-item id="boar-obj" src="/assets/obj/boar-obj.obj"></a-asset-item>
+                    <a-asset-item id="boar-mtl" src="/assets/obj/boar-obj.mtl"></a-asset-item>
+
+                    <a-asset-item id="wolf-obj" src="/assets/obj/wolf-obj.obj"></a-asset-item>
+                    <a-asset-item id="wolf-mtl" src="/assets/obj/wolf-obj.mtl"></a-asset-item>
+                </a-assets>
+                
+                <Entity geometry={{primitive: 'plane', width: 100, height: 100}} material="color: #55BB88" position="0 0 -4" rotation="-90 0 0"/>
+                <a-sky color="#F0FEFE"></a-sky>
+                
+                <Entity obj-model="obj: #bear-obj; mtl: #bear-mtl" position="0 0 -5"    rotation="0 0 0"  scale=".1 .1 .1" />
+                <Entity obj-model="obj: #boar-obj; mtl: #boar-mtl" position="3 0.5 -4"  rotation="0 0 0"  scale=".1 .1 .1" />
+                <Entity obj-model="obj: #wolf-obj; mtl: #wolf-mtl" position="-2 0.5 -3" rotation="0 0 0"  scale=".1 .1 .1" />
+                <Entity position="-2 0 -5" scale=".05 .05 .05" object-model="src: url(/assets/obj/pikachu/pikachu.json);" />
+            </Scene>
         );
     }
 }
