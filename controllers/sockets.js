@@ -2,15 +2,12 @@
 
 // Modules
 const express = require('express'),
-  // Const vars
-  router = express.Router();
+      router  = express.Router();
 
 // Routes
-router.get('/', (req, res) => {
-  req.io.emit('news', { hello: 'world' });
-  req.io.on('my other event', function (data) {
-    console.log(data);
-  });
+router.get('/attack', (req, res) => {
+  console.log('attack');
+  req.io.emit('attack', { move: 'move1' });
   res.json({ status: 'OK' });
 });
 

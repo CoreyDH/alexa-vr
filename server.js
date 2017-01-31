@@ -87,7 +87,7 @@ if (process.env.AMAZON_CLIENT_ID) {
 }
 
 // Connect Flash
-app.use(flash());
+// app.use(flash());
 
 // app.use(function(req, res, next) {
 //   res.locals.success_msg = req.flash('success_msg');
@@ -100,11 +100,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Sequelize init
-models.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
-.then(function(){
-	return models.sequelize.sync({force:true})
-})
-// models.sequelize.sync();
+// models.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
+// .then(function(){
+// 	return models.sequelize.sync({force:true})
+// })
+models.sequelize.sync();
 
 // Route for static content
 app.use(express.static(process.cwd() + '/public'));
