@@ -1,8 +1,6 @@
 import React from 'react';
 
-import Header from "./Header";
-
-export default class Layout extends React.Component {
+export default class AframeComponent extends React.Component {
     render() {
         return (
             <div>
