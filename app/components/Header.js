@@ -18,7 +18,6 @@ export default class Layout extends React.Component {
 
     componentWillMount() {
         UserStore.on('change', this.getStatus);
-        console.log('count', UserStore.listenerCount('change'));
     }
 
     componentWillUnmount() {
@@ -60,7 +59,7 @@ export default class Layout extends React.Component {
         }
 
         return (
-            <Navbar collapseOnSelect>
+            <Navbar collapseOnSelect fixedTop={this.props.fixedTop}>
                 <Navbar.Header>
                     <Navbar.Brand>
                         <a href="#">AlexaVR Pets</a>

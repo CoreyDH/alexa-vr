@@ -8,6 +8,7 @@ class UserStore extends EventEmitter {
 
         this.loggedIn = false;
         this.userPets = false;
+        this.chosenPet = [];
     }
 
     isLoggedIn() {
@@ -16,6 +17,10 @@ class UserStore extends EventEmitter {
 
     getPets() {
         return this.userPets;
+    }
+
+    getChosenPet(id) {
+        return this.chosenPet.filter((el) => { return el.id === id; })[0];
     }
 
     handleActions(action) {
@@ -29,6 +34,10 @@ class UserStore extends EventEmitter {
             case 'SHOW_PETS':
                 this.userPets = action.userPets;
                 this.emit('petChange');
+                break;
+            case 'STORE_CHOSEN_PET':
+                this.chosenPet.push(action.chosenPet);
+                this.emit('chosenPet');                
                 break;
         }
     }

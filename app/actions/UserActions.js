@@ -39,7 +39,7 @@ export function getPets() {
 }
 
 export function addPet(type) {
-    ajax.addPet({ 
+    ajax.addPet({
         pet: {
             name: 'Alexa'
         }
@@ -49,5 +49,12 @@ export function addPet(type) {
             type: 'SHOW_PETS',
             userPets: pet
         });
+    });
+}
+
+export function storeChosen(pet) {
+    dispatcher.dispatch({
+        type: 'STORE_CHOSEN_PET',
+        chosenPet: pet
     });
 }

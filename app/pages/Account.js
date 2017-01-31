@@ -1,4 +1,5 @@
 import React from 'react';
+import { hashHistory } from 'react-router';
 import { Button } from 'react-bootstrap';
 
 import * as UserActions from '../actions/UserActions';
@@ -13,8 +14,11 @@ export default class Account extends React.Component {
 
         this.getPets = this.getPets.bind(this);
         this.state = {
-            userPets: UserActions.getPets()
+            userPets: UserActions.getPets(),
+            loggedIn: UserStore.isLoggedIn()
         }
+
+        console.log('state for account', this.state);
     }
 
     componentWillMount() {
@@ -39,35 +43,38 @@ export default class Account extends React.Component {
 
     render() {
 
+        // if(!this.state.loggedIn) {
+        //     hashHistory.push('/login');
+        // }
+
         const displayPets = Array.isArray(this.state.userPets) ? (this.state.userPets.length > 0 ? true : false) : false;
         let petHTML = '';
 
         console.log('user pets: ', this.state.userPets, 'display?', displayPets);
-
-
-
         if (displayPets) {
 
-            let PetList = this.state.userPets.map((pet, i) => <Pets key={i} userPet={pet} />);
+            let PetList = this.state.userPets.map((pet, i) => <Pets key={i} account={this.state.loggedIn} userPet={pet} />);
 
             petHTML = (
-                <ul className="user-pet-holder">
+                <ul>
                     {PetList}
                 </ul>
             )
 
         } else {
             petHTML = (
-                <div className="user-pet-holder">
-                    No pets found! <br /><br />
-                    <Button onClick={this.addPet.bind(this)}>Add Pet Alexa</Button>
-                </div>
+                    <span>No pets found!</span>
             );
         }
 
         return (
-            <div>
-                {petHTML}
+            <div className="user-pet-holder">
+                <div className="col-xs-12 col-sm-6">
+                    {petHTML}
+                </div>
+                <div className="col-xs-12 col-sm-6">
+                    <Button onClick={this.addPet.bind(this)}>Add New Pet</Button>
+                </div>
             </div>
         );
     }

@@ -6,7 +6,7 @@ module.exports = {
             return res.data;
         })
         .catch(function (err) {
-            console.log('Axios error', err);
+            console.log('Error checking user session', err);
         });
     },
     logout: function() {
@@ -14,7 +14,7 @@ module.exports = {
             return res.data;
         })
         .catch(function (err) {
-            console.log(err);
+            console.log('Error logging out', err);
         });
     },
     getPets: function() {
@@ -22,15 +22,15 @@ module.exports = {
             return res.data;
         })
         .catch(function (err) {
-            console.log(err);
+            console.log('Error retrieving user\'s pets', err);
         });
     },
     addPet: function(pet) {
-        return axios.post('/pets/save', pet).then(function(res) {
+        return axios.post('/account/pets', pet).then(function(res) {
             return res.data;
         })
         .catch(function (err) {
-            console.log(err);
+            console.log('Error adding pet to user collection', err);
         });
     }
 }

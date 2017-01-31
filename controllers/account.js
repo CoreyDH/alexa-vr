@@ -50,10 +50,10 @@ router.get('/status', (req, res) => {
 // Create User
 router.post('/register', function (req, res) {
 
-    const username = req.body.username,
-        email = req.body.email,
-        password = req.body.password,
-        password2 = req.body.password2;
+    const username = req.body.username.trim(),
+        email = req.body.email.trim(),
+        password = req.body.password.trim(),
+        password2 = req.body.password2.trim();
 
     // Validate form fields
     req.checkBody('username', 'Username cannot be empty!').notEmpty();
@@ -65,7 +65,7 @@ router.post('/register', function (req, res) {
     const errors = req.validationErrors();
     // If there are errors, return to page with error message(s)
     if (errors) {
-        res.render('register', { errors: errors });
+        res.status(400).json({ errors: errors });
     } else {
         // Check if user already exists, if not insert into database.
         models.User.sync().then(function () {
@@ -84,10 +84,8 @@ router.post('/register', function (req, res) {
                     //   console.log(account.get({ plain: true }), created);
                     res.redirect('/#/login');
                 } else {
-                    res.render('register', {
-                        errors: [{
-                            msg: 'E-mail already exists in database!'
-                        }]
+                    res.status(400).json({
+                        errors: 'Username already exists!'
                     })
                 }
             });
@@ -141,17 +139,73 @@ router.post('/login',
     passport.authenticate('local', {
         successRedirect: '/#/account',
         failureRedirect: '/#/login',
-        failureFlash: false
+        failureFlash: true
     })
 );
 
 // Log out
 router.get('/logout', (req, res) => {
-    req.logOut();
+    req.session.destroy(function (err) {
+        res.redirect('/');
+    });
+});
+
+router.post('/pets', (req, res) => {
+
+    if (req.user && req.body.pet) {
+        const pet = req.body.pet;
+        
+        models.User.findOne({
+            where: {
+                email: req.user.email
+            }
+        }).then((userInstance) => {
+            // TODO Find requested pet and add to User key
+
+            models.Pets.findOne({
+                where: pet,
+                include: [
+                    { model: models.Moves, as: 'move1' },
+                    { model: models.Moves, as: 'move2' },
+                    { model: models.Moves, as: 'move3' },
+                    { model: models.Moves, as: 'move4' }
+                ]
+            }).then((petInstance) => {
+
+                let userPetEntry = {
+                    name: petInstance.name,
+                    move1_pp: petInstance.move1.pp,
+                    move2_pp: petInstance.move2.pp,
+                    move3_pp: petInstance.move3.pp,
+                    move4_pp: petInstance.move4.pp
+                };
+
+                models.UserPets.create(userPetEntry).then((userPetInstance) => {
+                    userInstance.addPet(userPetInstance)
+                    userPetInstance.setUserMove1(petInstance.move1);
+                    userPetInstance.setUserMove2(petInstance.move2);
+                    userPetInstance.setUserMove3(petInstance.move3);
+                    userPetInstance.setUserMove4(petInstance.move4);
+                    userPetInstance.setPet(petInstance);
+
+                    res.json(userPetInstance);
+                });
+            });
+
+        });
+
+    } else {
+        res.json({
+            error: 'User session not stored or Pet information not requested!'
+        })
+    }
+
 });
 
 // Check if user is logged in
 router.get('/pets', (req, res) => {
+
+
     if (req.user) {
         models.User.findOne({
             where: {
@@ -162,47 +216,18 @@ router.get('/pets', (req, res) => {
             models.UserPets.findAll({
                 where: {
                     UserId: user.id
-                }
+                },
+                include: [
+                    { model: models.Pets },
+                    { model: models.Moves, as: 'userMove1' },
+                    { model: models.Moves, as: 'userMove2' },
+                    { model: models.Moves, as: 'userMove3' },
+                    { model: models.Moves, as: 'userMove4' }
+                ]
             }).then((userPets) => {
 
                 console.log('User pets for ', user.username, ' pets: ', userPets);
                 res.json(userPets);
-            })
-
-        });
-    } else {
-        res.send(false);
-    }
-});
-
-// Check if user is logged in
-router.post('/add-pet', (req, res) => {
-
-    if (req.user) {
-
-        const addPet = {
-            name: req.body.pet
-        };
-
-        models.User.findOne({
-            where: {
-                username: req.user.username
-            }
-        }).then((userInstance) => {
-
-            models.Pets.findOne({
-                where: {
-                    name: addPet.name
-                }
-            }).then((petInstance) => {
-
-                console.log('pet instance', petInstance);
-                models.UserPets.create(petInstance.dataValues).then((userPetInstance) => {
-                    return userInstance.addPet(userPetInstance);
-                }).then((added) => {
-                    console.log(added);
-                    res.json(added);
-                });
             })
 
         });
