@@ -24,14 +24,14 @@ export default class Aframe extends React.Component {
         this.state = {
             player: {
                 name: 'Loading',
-                hp: 0
+                hp: 0,
+                hpMax: 1
             },
-            playerMaxHP: 0,
             cpu: {
                 name: 'Loading',
-                hp: 0
+                hp: 0,
+                hpMax: 1
             },
-            cpuMaxHP: 0,
             battleText: ''
         };
     }
@@ -41,14 +41,17 @@ export default class Aframe extends React.Component {
 
         // Get pet data and set state
         axios.get('/pets').then(res => {
+            res.data[1].hpMax = res.data[1].hp;
+            res.data[0].hpMax = res.data[0].hp;
+            
             this.setState({
                 player:      res.data[1],
-                playerMaxHP: res.data[1].hp,
                 cpu:         res.data[0],
-                cpuMaxHP:    res.data[0].hp,
                 battleText:  `A wild ${res.data[0].name} has appeared!`
             });
+
             console.log(`Player: ${this.state.player.name}, CPU: ${this.state.cpu.name}`);
+
             setTimeout(() => this.setState({ battleText: '' }), TEXT_DELAY);
         });
 
@@ -109,9 +112,34 @@ export default class Aframe extends React.Component {
                 </a-cylinder>
                 <Text
                     id="player_name"
-                    text={`${this.state.player.name}: ${this.state.player.hp} / ${this.state.playerMaxHP}`}
+                    text={`${this.state.player.name}: ${this.state.player.hp} / ${this.state.player.hpMax}`}
                     color="#DADADA"
                     position="1.20 0.06 -2.51"
+                />
+                <Entity
+                    id="player_hpBar"
+                    geometry={
+                    {
+                        primitive: 'box',
+                        width: game.playerHPWidth(this.state),
+                        height: 0.05,
+                        depth: 0.05
+                    }}
+                    material={`color: ${game.playerHPColor(this.state)}`}
+                    position={`${0.93 + (game.playerHPWidth(this.state) / 2)} 0.04 -2.3`}
+                    visible={game.playerHPWidth(this.state) > 0}
+                />
+                <Entity
+                    id="player_hpBar_box"
+                    geometry={
+                    {
+                        primitive: 'box',
+                        width: 1.7,
+                        height: 0.1,
+                        depth: 0.01
+                    }}
+                    material="color: #AAFFFF"
+                    position="1.73 0.04 -2.31"
                 />
 
                 <Entity
@@ -123,7 +151,7 @@ export default class Aframe extends React.Component {
                 />
                 <Text
                     id="cpu_name"
-                    text={`${this.state.cpu.name}: ${this.state.cpu.hp} / ${this.state.cpuMaxHP}`}
+                    text={`${this.state.cpu.name}: ${this.state.cpu.hp} / ${this.state.cpu.hpMax}`}
                     color="#DADADA"
                     position="-5.50 0.04 -5.53"
                     scale="2.00 2.00 2.00"

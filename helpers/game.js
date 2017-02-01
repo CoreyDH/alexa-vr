@@ -1,8 +1,9 @@
 'use strict';
 
-// Level constants
-const LEVEL     = 20,
-      LEVEL_MOD = ((2 * LEVEL) + 10) / 250;
+// Constants
+const LEVEL        = 20,
+      LEVEL_MOD    = ((2 * LEVEL) + 10) / 250,
+      HP_MAX_WIDTH = 1.6;
 
 // Damage calculation
 function getDamage (attacker, defender, move) {
@@ -15,7 +16,7 @@ function getDamage (attacker, defender, move) {
 
 
 module.exports = {
-    playerAttack: function(state, moveName) {
+    playerAttack: function (state, moveName) {
         const attacker = state.player,
               defender = state.cpu,
               move     = state.player[moveName],
@@ -29,7 +30,17 @@ module.exports = {
 
         return state;
     },
-    cpuAttack: function(state) {
+    playerHPWidth: function (state) {
+        return HP_MAX_WIDTH * state.player.hp / state.player.hpMax
+    },
+    playerHPColor: function (state) {
+        const hpPercent = state.player.hp / state.player.hpMax;
+        
+        if      (hpPercent < 0.25) return 'red';
+        else if (hpPercent < 0.5)  return 'yellow';
+        else                       return 'green';
+    },
+    cpuAttack: function (state) {
         const attacker = state.cpu,
               defender = state.player,
               move     = state.cpu['move' + Math.ceil(Math.random() * 4)],
