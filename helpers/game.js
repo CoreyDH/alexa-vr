@@ -22,10 +22,10 @@ module.exports = {
               damage   = getDamage(attacker, defender, move);
         
         state.cpu.hp - damage < 0 ? state.cpu.hp = 0 : state.cpu.hp -= damage;
-
-        console.log(`${attacker.name} uses ${move.name} and does ${damage} damage`);
-        console.log(`${defender.name} has ${state.cpu.hp} HP remaining`);
-        if (state.cpu.hp === 0) console.log(`${defender.name} has fainted!`)
+        state.battleText =
+            `${attacker.name} uses ${move.name} and does ${damage} damage
+            `;
+        if (state.cpu.hp === 0) state.battleText += `${defender.name} has fainted!`;
 
         return state;
     },
@@ -36,10 +36,10 @@ module.exports = {
               damage   = getDamage(attacker, defender, move);
         
         state.player.hp - damage < 0 ? state.player.hp = 0 : state.player.hp -= damage;
-
-        console.log(`${attacker.name} uses ${move.name} and does ${damage} damage`);
-        console.log(`${defender.name} has ${state.player.hp} HP remaining`);
-        if (state.player.hp === 0) console.log(`${defender.name} has fainted!`)
+        state.battleText =
+            `${attacker.name} uses ${move.name} and does ${damage} damage
+            `;
+        if (state.cpu.hp === 0) state.battleText += `${defender.name} has fainted!`;
 
         return state;
     }

@@ -13,7 +13,9 @@ import Sky from './aframe/Sky'
 import * as game from '../../helpers/game.js'
 
 extras.loaders.registerAll();
-const socket = io();
+const socket     = io(),
+      CPU_DELAY  = 3000,
+      TEXT_DELAY = 3000;
 
 export default class Aframe extends React.Component {
     constructor(props) {
@@ -29,27 +31,48 @@ export default class Aframe extends React.Component {
                 name: 'Loading',
                 hp: 0
             },
-            cpuMaxHP: 0
+            cpuMaxHP: 0,
+            battleText: ''
         };
     }
     
     componentWillMount() {
+        let isLocked = false;
+
         // Get pet data and set state
         axios.get('/pets').then(res => {
             this.setState({
                 player:      res.data[1],
                 playerMaxHP: res.data[1].hp,
                 cpu:         res.data[0],
-                cpuMaxHP:    res.data[0].hp
+                cpuMaxHP:    res.data[0].hp,
+                battleText:  `A wild ${res.data[0].name} has appeared!`
             });
             console.log(`Player: ${this.state.player.name}, CPU: ${this.state.cpu.name}`);
+            setTimeout(() => this.setState({ battleText: '' }), TEXT_DELAY);
         });
 
         // On player attack
         socket.on('attack', data => {
-            this.setState(game.playerAttack(this.state, data.move));
-            setTimeout(() => this.setState(game.cpuAttack(this.state, data.move)), 2000);
-            document.getElementById('player').emit(data.move);
+            // Check if currently playing out attack
+            if (!isLocked) {
+                
+                // Player attack phase
+                this.setState(game.playerAttack(this.state, data.move));
+                document.getElementById('player').emit('dance');
+                isLocked = true;
+
+                // CPU attack phase
+                setTimeout(() => {
+                    this.setState(game.cpuAttack(this.state, data.move));
+                    isLocked = false;
+                }, CPU_DELAY);
+
+                // Clear battle text
+                setTimeout(() => {
+                    if (!isLocked) this.setState({ battleText: '' })
+                }, CPU_DELAY + TEXT_DELAY);
+            }
         });
 
     }
@@ -78,7 +101,7 @@ export default class Aframe extends React.Component {
                 >
                     <a-animation
                         attribute="rotation"
-                        dur="5000"
+                        dur="2500"
                         fill="forwards"
                         to="180 360 0"
                         begin="dance"
@@ -88,7 +111,7 @@ export default class Aframe extends React.Component {
                     id="player_name"
                     text={`${this.state.player.name}: ${this.state.player.hp} / ${this.state.playerMaxHP}`}
                     color="#DADADA"
-                    position="1.70 0.06 -2.51"
+                    position="1.20 0.06 -2.51"
                 />
 
                 <Entity
@@ -102,10 +125,17 @@ export default class Aframe extends React.Component {
                     id="cpu_name"
                     text={`${this.state.cpu.name}: ${this.state.cpu.hp} / ${this.state.cpuMaxHP}`}
                     color="#DADADA"
-                    position="-4.81 0.04 -5.53"
+                    position="-5.50 0.04 -5.53"
                     scale="2.00 2.00 2.00"
                 />
-                
+
+                <Text
+                    id="battle_text"
+                    text={this.state.battleText}
+                    color="#DADADA"
+                    position="-2.96 0.12 -2.59"
+                    scale="1.00 1.00 1.00"
+                />
 
             </Scene>
         );

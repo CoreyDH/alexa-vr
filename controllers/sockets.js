@@ -5,9 +5,11 @@ const express = require('express'),
       router  = express.Router();
 
 // Routes
-router.get('/attack', (req, res) => {
-  console.log('attack');
-  req.io.emit('attack', { move: 'move1' });
+router.get('/attack/:move', (req, res) => {
+  const moveName = req.params.move;
+  console.log(moveName);
+
+  req.io.emit('attack', { move: moveName });
   res.json({ status: 'OK' });
 });
 
