@@ -12,25 +12,27 @@ export default class Account extends React.Component {
     constructor() {
         super();
 
-        this.getPets = this.getPets.bind(this);
         this.state = {
-            userPets: UserActions.getPets(),
-            loggedIn: UserStore.isLoggedIn()
+            userPets: {
+                error: null
+            }
         }
+
+        this.getPets = this.getPets.bind(this);
 
         console.log('state for account', this.state);
     }
 
     componentWillMount() {
         UserStore.on('petChange', this.getPets);
+        UserActions.getPets();
     }
 
     componentWillUnmount() {
-        UserStore.removeListener('petChange', this.getPets)
+        UserStore.removeListener('petChange', this.getPets);
     }
 
     getPets() {
-
         console.log('emitted change received for pets');
         this.setState({
             userPets: UserStore.getPets()
@@ -53,13 +55,13 @@ export default class Account extends React.Component {
         console.log('user pets: ', this.state.userPets, 'display?', displayPets);
         if (displayPets) {
 
-            let PetList = this.state.userPets.map((pet, i) => <Pets key={i} account={this.state.loggedIn} userPet={pet} />);
+            const PetList = this.state.userPets.map((pet, i) => <Pets key={i} index={i} userPet={pet} />);
 
             petHTML = (
                 <ul>
                     {PetList}
                 </ul>
-            )
+            );
 
         } else {
             petHTML = (
@@ -69,11 +71,12 @@ export default class Account extends React.Component {
 
         return (
             <div className="user-pet-holder">
-                <div className="col-xs-12 col-sm-6">
+                <div className="col-xs-12 col-sm-9">
                     {petHTML}
                 </div>
-                <div className="col-xs-12 col-sm-6">
-                    <Button onClick={this.addPet.bind(this)}>Add New Pet</Button>
+                <div className="col-xs-12 col-sm-3">
+                    <p>{this.state.userPets.error}</p>
+                    <Button bsStyle="success" onClick={this.addPet.bind(this)}>Add New Pet</Button>
                 </div>
             </div>
         );

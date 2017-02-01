@@ -6,13 +6,14 @@ class UserStore extends EventEmitter {
     constructor() {
         super();
 
-        this.loggedIn = false;
-        this.userPets = false;
+        this.user = false;
+        this.userPets = [];
         this.chosenPet = [];
+        this.formErrors = null;
     }
 
-    isLoggedIn() {
-        return this.loggedIn;
+    getUser() {
+        return this.user;
     }
 
     getPets() {
@@ -20,24 +21,69 @@ class UserStore extends EventEmitter {
     }
 
     getChosenPet(id) {
-        return this.chosenPet.filter((el) => { return el.id === id; })[0];
+        return this.chosenPet.filter((el) => { return el.id === id; });
+    }
+
+    isAuthenticated() {
+        return sessionStorage.getItem('token') !== null && this.user;
+    }
+
+    getToken() {
+        return sessionStorage.getItem('token');
+    }
+
+    setToken(token) {
+        sessionStorage.setItem('token', token);
+    }
+
+    destroyToken() {
+        sessionStorage.removeItem('token');
+    }
+
+    getFormErrors() {
+        return this.formErrors;
     }
 
     handleActions(action) {
         console.log('UserStore received an action', action);
 
         switch (action.type) {
-            case 'CHECK_STATUS':
-                this.loggedIn = action.status;
-                this.emit('change');
+            case 'LOGIN':
+
+                if (!action.data.errors && action.data.user) {
+                    this.setToken(action.data.token);
+                    this.user = action.data.user;
+                    this.emit('session');
+                } else {
+                    this.formErrors = action.data.errors;
+                    this.emit('formError');
+                }
                 break;
+                
+            case 'LOGOUT':
+                this.destroyToken();
+                this.user = action.user
+                this.emit('session');
+                break;
+
+            case 'FETCH_USER':
+                this.user = action.user;
+                this.emit('getUser');
+                break;
+
             case 'SHOW_PETS':
                 this.userPets = action.userPets;
                 this.emit('petChange');
                 break;
+
+            case 'ADD_PET':
+                this.userPets.push(action.newPet);
+                this.emit('petChange');
+                break;
+
             case 'STORE_CHOSEN_PET':
                 this.chosenPet.push(action.chosenPet);
-                this.emit('chosenPet');                
+                this.emit('chosenPet');
                 break;
         }
     }

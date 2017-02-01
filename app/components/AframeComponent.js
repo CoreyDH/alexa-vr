@@ -1,5 +1,8 @@
 import React from 'react';
 
+import * as UserActions from '../actions/UserActions';
+import UserStore from "../stores/UserStore";
+
 import 'aframe'
 import extras from 'aframe-extras'
 import {Entity, Scene} from 'aframe-react'
@@ -17,12 +20,13 @@ socket.on('news', function (data) {
 export default class Aframe extends React.Component {
 
     constructor() {
-        super();
-
-        console.log(this.props.params);
+        super()
     }
 
     render() {
+
+        console.log(this.props);
+
         return (
             <Scene>
                 <a-assets>

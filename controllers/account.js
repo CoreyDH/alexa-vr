@@ -2,10 +2,12 @@
 
 // Modules
 const express = require('express'),
+
     // Models
     models = require('../models'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
+    auth = require('../helpers/auth.js'),
 
     // Const vars
     router = express.Router();
@@ -34,17 +36,46 @@ router.get('/', (req, res) => {
 // router.get('/register', (req, res) => res.render('register'));
 
 // Check if user is logged in
-router.get('/status', (req, res) => {
+router.get('/user', (req, res) => {
     if (req.user) {
         res.json({
-            login: {
-                username: req.user.username,
-                email: req.user.email
-            }
+            username: req.user.username,
+            email: req.user.email
         });
     } else {
-        res.send(false);
+        res.json({});
     }
+});
+
+router.get('/register', (req, res) => {
+    const fields = [
+        {
+            name: 'username',
+            label: 'Username',
+            placeholder: 'Create a username.',
+            type: 'text'
+        },
+        {
+            name: 'email',
+            label: 'Email',
+            placeholder: 'Enter your email here.',
+            type: 'text'
+        },
+        {
+            name: 'password',
+            label: 'Password',
+            placeholder: 'Enter your password here.',
+            type: 'password'
+        },
+        {
+            name: 'password2',
+            label: 'Confirm Password',
+            placeholder: 'Confirm your password.',
+            type: 'password'
+        }
+    ];
+
+    res.json(fields);
 });
 
 // Create User
@@ -63,9 +94,12 @@ router.post('/register', function (req, res) {
     req.checkBody('password2', 'Passwords do not match.').equals(req.body.password);
 
     const errors = req.validationErrors();
+
+    console.log(errors);
+    
     // If there are errors, return to page with error message(s)
     if (errors) {
-        res.status(400).json({ errors: errors });
+        res.json({ errors: errors });
     } else {
         // Check if user already exists, if not insert into database.
         models.User.sync().then(function () {
@@ -82,10 +116,19 @@ router.post('/register', function (req, res) {
                 // Check if creation was successful
                 if (created) {
                     //   console.log(account.get({ plain: true }), created);
-                    res.redirect('/#/login');
+                    const token = auth.generateToken(account.get({ plain: true }));
+
+                    res.json({
+                        user: account,
+                        token: token
+                    });
+
                 } else {
-                    res.status(400).json({
-                        errors: 'Username already exists!'
+                    res.json({
+                        errors: [{
+                            param: 'username',
+                            msg: 'Username already exists!'
+                        }]
                     })
                 }
             });
@@ -103,7 +146,7 @@ passport.use(new LocalStrategy(
                 username: username
             }
         }).then(function (user) {
-            // if (err) { return done(err); }
+            // TODO ADD TOKEN
 
             if (!user) {
                 return done(null, false, { message: 'Incorrect username.' });
@@ -112,10 +155,10 @@ passport.use(new LocalStrategy(
             user.validPassword(password, function (err, isMatch) {
                 if (err) throw err;
 
-                // console.log('Match check', isMatch);
-
                 if (isMatch) {
-                    return done(null, user);
+                    const token = auth.generateToken(user);
+
+                    return done(null, token, user);
                 } else {
                     return done(null, false, { message: 'Incorrect password.' });
                 }
@@ -135,13 +178,28 @@ passport.deserializeUser(function (id, done) {
 });
 
 // Verify login
-router.post('/login',
-    passport.authenticate('local', {
-        successRedirect: '/#/account',
-        failureRedirect: '/#/login',
-        failureFlash: true
-    })
-);
+router.post('/login', function (req, res, next) {
+    passport.authenticate('local', function (err, token, user) {
+        if (err) { return next(err); }
+        if (!user) { 
+            return res.json({
+                success: false,
+                message: 'User or password does not match.'
+            }); 
+        }
+
+        req.logIn(user, function (err) {
+            if (err) { return next(err); }
+
+            return res.json({
+                success: true,
+                message: 'You have sucessfully logged in!',
+                token,
+                user: user
+            });
+        });
+    })(req, res, next);
+});
 
 // Log out
 router.get('/logout', (req, res) => {
@@ -150,11 +208,34 @@ router.get('/logout', (req, res) => {
     });
 });
 
+// router.post('/check-token', function (req, res, next) {
+//     passport.authenticate('local', function (err, token, user) {
+//         if (err) { return next(err); }
+//         if (!user) { 
+//             return res.json({
+//                 success: false,
+//                 message: 'User or password does not match.'
+//             }); 
+//         }
+
+//         req.logIn(user, function (err) {
+//             if (err) { return next(err); }
+
+//             return res.json({
+//                 success: true,
+//                 message: 'You have sucessfully logged in!',
+//                 token,
+//                 user: user
+//             });
+//         });
+//     })(req, res, next);
+// });
+
 router.post('/pets', (req, res) => {
 
     if (req.user && req.body.pet) {
         const pet = req.body.pet;
-        
+
         models.User.findOne({
             where: {
                 email: req.user.email

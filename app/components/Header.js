@@ -10,26 +10,25 @@ export default class Layout extends React.Component {
     constructor() {
         super();
 
-        this.getStatus = this.getStatus.bind(this);
         this.state = {
-            loggedIn: UserActions.checkStatus()
+            isLoggedIn: UserStore.isAuthenticated(),
         }
+
+        this.checkAuthentication = this.checkAuthentication.bind(this);
     }
 
     componentWillMount() {
-        UserStore.on('change', this.getStatus);
+        UserStore.on('session', this.checkAuthentication);
     }
 
     componentWillUnmount() {
-        UserStore.removeListener('change', this.getStatus)
+        UserStore.removeListener('session', this.checkAuthentication);
     }
 
-    getStatus() {
-
-        console.log('emitted change received');
+    checkAuthentication() {
         this.setState({
-                loggedIn: UserStore.isLoggedIn()
-        });
+            isLoggedIn: UserStore.isAuthenticated()
+        })
     }
 
     logOut() {
@@ -40,9 +39,9 @@ export default class Layout extends React.Component {
 
         let userLinks = null;
 
-        console.log('login state', this.state.loggedIn);
+        console.log('login state', this.state.isLoggedIn);
 
-        if (this.state.loggedIn) {
+        if (this.state.isLoggedIn) {
             userLinks = (
                 <Nav pullRight>
                     <NavDropdown title="My Account" id="my-account">

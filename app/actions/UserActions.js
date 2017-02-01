@@ -1,17 +1,14 @@
 import dispatcher from '../dispatcher';
 import ajax from '../../helpers/ajax.js';
 
-export function checkStatus(type) {
-    dispatcher.dispatch({
-        type: 'FETCH_STATUS'
-    });
+export function getUser(type) {
 
-    ajax.checkLogin().then((status) => {
+    ajax.getUser().then((user) => {
         console.log('Login status', status);
 
         dispatcher.dispatch({
-            type: 'CHECK_STATUS',
-            status: status
+            type: 'FETCH_USER',
+            user: user
         });
     })
         .catch((err) => {
@@ -19,11 +16,31 @@ export function checkStatus(type) {
         });
 }
 
-export function logOut() {
-    ajax.logout().then(() => {
+export function register(formData) {
+    ajax.register(formData).then((data) => {
+
         dispatcher.dispatch({
-            type: 'CHECK_STATUS',
-            status: false
+            type: 'LOGIN',
+            data
+        });
+    });
+}
+
+export function logIn(formData) {
+    ajax.logIn(formData).then((data) => {
+
+        dispatcher.dispatch({
+            type: 'LOGIN',
+            data
+        });
+    });
+}
+
+export function logOut() {
+    ajax.logOut().then(() => {
+        dispatcher.dispatch({
+            type: 'LOGOUT',
+            user: false
         });
     });
 }
@@ -46,13 +63,14 @@ export function addPet(type) {
     }).then((pet) => {
 
         dispatcher.dispatch({
-            type: 'SHOW_PETS',
-            userPets: pet
+            type: 'ADD_PET',
+            newPet: pet
         });
+
     });
 }
 
-export function storeChosen(pet) {
+export function storePet(pet) {
     dispatcher.dispatch({
         type: 'STORE_CHOSEN_PET',
         chosenPet: pet
