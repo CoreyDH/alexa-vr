@@ -16,42 +16,31 @@ function getDamage (attacker, defender, move) {
 
 
 module.exports = {
-    playerAttack: function (state, moveName) {
-        const attacker = state.player,
-              defender = state.cpu,
-              move     = state.player[moveName],
+    attack: function (state, isPlayer, moveName) {
+        const attacker = isPlayer ? state.player : state.cpu,
+              defender = isPlayer ? state.cpu    : state.player,
+              move     = isPlayer ? state.player[moveName] : state.cpu['move' + Math.ceil(Math.random() * 4)], 
               damage   = getDamage(attacker, defender, move);
         
-        state.cpu.hp - damage < 0 ? state.cpu.hp = 0 : state.cpu.hp -= damage;
+        defender.hp - damage < 0 ? defender.hp = 0 : defender.hp -= damage;
         state.battleText =
             `${attacker.name} uses ${move.name} and does ${damage} damage
             `;
-        if (state.cpu.hp === 0) state.battleText += `${defender.name} has fainted!`;
+        if (defender.hp === 0) state.battleText += `${defender.name} has fainted!`;
+        if (!isPlayer) state.lastMove = move.name;
 
         return state;
     },
-    playerHPWidth: function (state) {
-        return HP_MAX_WIDTH * state.player.hp / state.player.hpMax
+    hpWidth: function (state, isPlayer) {
+        const pet = isPlayer ? state.player : state.cpu;
+        return HP_MAX_WIDTH * pet.hp / pet.hpMax
     },
-    playerHPColor: function (state) {
-        const hpPercent = state.player.hp / state.player.hpMax;
+    hpColor: function (state, isPlayer) {
+        const pet = isPlayer ? state.player : state.cpu,
+              pct = pet.hp / pet.hpMax;
         
-        if      (hpPercent < 0.25) return 'red';
-        else if (hpPercent < 0.5)  return 'yellow';
-        else                       return 'green';
-    },
-    cpuAttack: function (state) {
-        const attacker = state.cpu,
-              defender = state.player,
-              move     = state.cpu['move' + Math.ceil(Math.random() * 4)],
-              damage   = getDamage(attacker, defender, move);
-        
-        state.player.hp - damage < 0 ? state.player.hp = 0 : state.player.hp -= damage;
-        state.battleText =
-            `${attacker.name} uses ${move.name} and does ${damage} damage
-            `;
-        if (state.cpu.hp === 0) state.battleText += `${defender.name} has fainted!`;
-
-        return state;
+        if      (pct < 0.25) return 'red';
+        else if (pct < 0.5)  return 'yellow';
+        else                 return 'green';
     }
 }
