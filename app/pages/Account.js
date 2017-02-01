@@ -15,7 +15,8 @@ export default class Account extends React.Component {
         this.state = {
             userPets: {
                 error: null
-            }
+            },
+            authenticated: UserStore.isAuthenticated()
         }
 
         this.getPets = this.getPets.bind(this);
@@ -25,11 +26,19 @@ export default class Account extends React.Component {
 
     componentWillMount() {
         UserStore.on('petChange', this.getPets);
+        UserStore.on('session', this.getPets);
         UserActions.getPets();
     }
 
     componentWillUnmount() {
         UserStore.removeListener('petChange', this.getPets);
+        UserStore.removeListener('session', this.getPets);
+    }
+
+    redirectAccount() {
+        this.setState({
+            authenticated: UserStore.isAuthenticated()
+        })
     }
 
     getPets() {
@@ -38,6 +47,7 @@ export default class Account extends React.Component {
             userPets: UserStore.getPets()
         });
     }
+    
 
     addPet() {
         UserActions.addPet();
@@ -45,9 +55,9 @@ export default class Account extends React.Component {
 
     render() {
 
-        // if(!this.state.loggedIn) {
-        //     hashHistory.push('/login');
-        // }
+        if(!this.state.authenticated) {
+            hashHistory.push('/login');
+        }
 
         const displayPets = Array.isArray(this.state.userPets) ? (this.state.userPets.length > 0 ? true : false) : false;
         let petHTML = '';
@@ -55,7 +65,7 @@ export default class Account extends React.Component {
         console.log('user pets: ', this.state.userPets, 'display?', displayPets);
         if (displayPets) {
 
-            const PetList = this.state.userPets.map((pet, i) => <Pets key={i} index={i} userPet={pet} />);
+            const PetList = this.state.userPets.map((pet, i) => <Pets key={i} index={i} user={this.state.authenticated} userPet={pet} />);
 
             petHTML = (
                 <ul>

@@ -19,13 +19,11 @@ socket.on('news', function (data) {
 
 export default class Aframe extends React.Component {
 
-    constructor() {
-        super()
-    }
-
     render() {
 
         console.log(this.props);
+
+        this.someFunction.bind(this)
 
         return (
             <Scene>

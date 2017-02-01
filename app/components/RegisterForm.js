@@ -19,6 +19,8 @@ export default class RegisterForm extends React.Component {
                 password2: ''
             }
         }
+
+        this.getErrors = this.getErrors.bind(this);
     }
 
     componentWillMount() {

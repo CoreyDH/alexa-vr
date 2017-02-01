@@ -195,7 +195,11 @@ router.post('/login', function (req, res, next) {
                 success: true,
                 message: 'You have sucessfully logged in!',
                 token,
-                user: user
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email
+                }
             });
         });
     })(req, res, next);

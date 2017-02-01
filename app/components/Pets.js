@@ -13,7 +13,7 @@ export default class Pets extends React.Component {
 
     storePetObj() {
         UserActions.storePet({
-            id: this.props.index,
+            id: this.props.user.username + '-' + this.props.index,
             pet: this.props.userPet
         });
     }
