@@ -4,7 +4,7 @@ import ajax from '../../helpers/ajax.js';
 export function getUser(type) {
 
     ajax.getUser().then((user) => {
-        console.log('Login status', status);
+        // console.log('Login status', status);
 
         dispatcher.dispatch({
             type: 'FETCH_USER',
@@ -36,6 +36,16 @@ export function logIn(formData) {
     });
 }
 
+export function logInWithToken(token) {
+    ajax.logInWithToken(token).then((data) => {
+
+        dispatcher.dispatch({
+            type: 'LOGIN',
+            data
+        });
+    });
+}
+
 export function logOut() {
     ajax.logOut().then(() => {
         dispatcher.dispatch({
@@ -56,25 +66,36 @@ export function getPets() {
 }
 
 export function addPet(newPet) {
-    ajax.addPet(newPet).then((pet) => {
+    // console.log('Adding new pet', newPet);
 
-        dispatcher.dispatch({
-            type: 'ADD_PET',
-            newPet: pet
-        });
-
+    ajax.addPet({ pet: newPet }).then((pet) => {
+        if(!pet.error) {
+            this.getPets();
+        } else {
+            dispatcher.dispatch({
+                type: 'FORM_ERROR',
+                errors: pet.error
+            });
+        }
+        
     });
 }
 
 export function removePet(id) {
+
+    // console.log('hit delete action', id);
+    
     ajax.removePet(id).then((pet) => {
 
-        dispatcher.dispatch({
-            type: 'REMOVE_PET',
-            pet: pet,
-            id: id
-        });
-
+        if(!pet.error) {
+            this.getPets();
+        } else {
+            dispatcher.dispatch({
+                type: 'FORM_ERROR',
+                errors: pet.error
+            });
+        }
+        
     });
 }
 

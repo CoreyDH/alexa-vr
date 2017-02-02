@@ -58,12 +58,12 @@ class UserStore extends EventEmitter {
     }
 
     handleActions(action) {
-        console.log('UserStore received an action', action);
+        // console.log('UserStore received an action', action);
 
         switch (action.type) {
             case 'LOGIN':
 
-                if (!action.data.errors && action.data.user) {
+                if (action.data.success && action.data.user) {
                     this.setToken(action.data.token);
                     this.user = action.data.user;
                     this.emit('session');
@@ -89,9 +89,11 @@ class UserStore extends EventEmitter {
                 this.emit('petChange');
                 break;
 
-            case 'ADD_PET':
-                this.userPets.push(action.newPet);
-                this.emit('petChange');
+            case 'FORM_ERROR':
+                this.formErrors = {
+                    errors: action.errors
+                }
+                this.emit('formError');
                 break;
 
             case 'REMOVE_PET':

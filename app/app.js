@@ -24,7 +24,7 @@ ReactDOM.render(
       <Route path="logout"   name="logout"   component={Logout}></Route>
       <Route path="register" name="register" component={Register}></Route>
       <Route path="account"  name="account"  component={Account}></Route>
-      <Route path="aframe/:chosenId"   name="aframe"   component={Aframe}></Route>
+      <Route path="aframe/:userPetId"   name="aframe"   component={Aframe}></Route>
     </Route>
   </Router>,
 app);

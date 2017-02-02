@@ -7,7 +7,8 @@ const express = require('express'),
     models = require('../models'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
-    auth = require('../helpers/auth.js'),
+    auth = require('../helpers/auth'),
+    jwt = require('jsonwebtoken'),
 
     // Const vars
     router = express.Router();
@@ -16,12 +17,9 @@ const express = require('express'),
 // Routes
 router.get('/', (req, res) => {
 
-    console.log('User', req.user);
-
     if (req.user) {
 
         const user = req.user.dataValues;
-        console.log(user);
 
         res.render('account', {
             email: user.email,
@@ -95,7 +93,7 @@ router.post('/register', function (req, res) {
 
     const errors = req.validationErrors();
 
-    console.log(errors);
+    // console.log(errors);
 
     // If there are errors, return to page with error message(s)
     if (errors) {
@@ -119,6 +117,7 @@ router.post('/register', function (req, res) {
                     const token = auth.generateToken(account.get({ plain: true }));
 
                     res.json({
+                        success: true,
                         user: account,
                         token: token
                     });
@@ -212,35 +211,54 @@ router.get('/logout', (req, res) => {
     });
 });
 
-// router.post('/check-token', function (req, res, next) {
-//     passport.authenticate('local', function (err, token, user) {
-//         if (err) { return next(err); }
-//         if (!user) { 
-//             return res.json({
-//                 success: false,
-//                 message: 'User or password does not match.'
-//             }); 
-//         }
+router.post('/check-token', function (req, res, next) {
+    // check header or url parameters or post parameters for token
+    var token = req.body.token;
 
-//         req.logIn(user, function (err) {
-//             if (err) { return next(err); }
+    if (!token) {
+        return res.status(401).json({ message: 'Must pass token' });
+    }
+    // Check token that was passed by decoding token using secret
+    jwt.verify(token, 'secret', function (err, user) {
+        if (err) throw err;
 
-//             return res.json({
-//                 success: true,
-//                 message: 'You have sucessfully logged in!',
-//                 token,
-//                 user: user
-//             });
-//         });
-//     })(req, res, next);
-// });
+        models.User.findOne({
+            where: {
+                id: user.id
+            }
+        }).then(function (user) {
+
+            if (err) { return next(err); }
+            if (!user) {
+                return res.json({
+                    success: false,
+                    message: 'User or password does not match.'
+                });
+            }
+
+            req.logIn(user, function (err) {
+                if (err) { return next(err); }
+
+                return res.json({
+                    success: true,
+                    message: 'You have sucessfully logged in!',
+                    token,
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email
+                    }
+                });
+            });
+
+        });
+    });
+});
 
 router.post('/pets', (req, res) => {
 
     if (req.user && req.body.pet) {
         const pet = req.body.pet;
-
-        console.log('Creating new pet', pet);
 
         models.User.findOne({
             where: {
@@ -294,65 +312,78 @@ router.post('/pets', (req, res) => {
 // Check if user is logged in
 router.get('/pets', (req, res) => {
 
-
     if (req.user) {
-        console.log(req.user);
-        
-        models.User.findOne({
+
+        models.UserPets.findAll({
             where: {
-                username: req.user.username
-            }
-        }).then((user) => {
+                UserId: req.user.id
+            },
+            include: [
+                { model: models.Pets },
+                { model: models.Moves, as: 'userMove1' },
+                { model: models.Moves, as: 'userMove2' },
+                { model: models.Moves, as: 'userMove3' },
+                { model: models.Moves, as: 'userMove4' }
+            ]
+        }).then((userPets) => {
 
-            models.UserPets.findAll({
-                where: {
-                    UserId: user.id
-                },
-                include: [
-                    { model: models.Pets },
-                    { model: models.Moves, as: 'userMove1' },
-                    { model: models.Moves, as: 'userMove2' },
-                    { model: models.Moves, as: 'userMove3' },
-                    { model: models.Moves, as: 'userMove4' }
-                ]
-            }).then((userPets) => {
-
-                console.log('User pets for ', user.username, ' pets: ', userPets);
-                res.json(userPets);
-            })
-
+            // console.log('User pets for ', req.user.username, ' pets: ', userPets);
+            res.json(userPets);
         });
+
     } else {
         res.send(false);
     }
 });
 
-// Check if user is logged in
-router.delete('/pets', (req, res) => {
+router.get('/pet/:id', (req, res) => {
 
     if (req.user) {
-        models.User.findOne({
+
+        models.UserPets.findOne({
             where: {
-                username: req.user.username
-            }
-        }).then((user) => {
-
-            models.UserPets.findOne({
-                where: {
-                    UserId: user.id,
-                    id: req.body.id
-                }
-            }).then((userPets) => {
-
-                userPets.destroy().then((oldData) => {
-                    res.json(oldData);
-                });
-
-            })
-
+                id: req.params.id,
+                UserId: req.user.id
+            },
+            include: [
+                { model: models.Pets },
+                { model: models.Moves, as: 'userMove1' },
+                { model: models.Moves, as: 'userMove2' },
+                { model: models.Moves, as: 'userMove3' },
+                { model: models.Moves, as: 'userMove4' }
+            ]
+        }).then((userPets) => {
+            res.json(userPets);
         });
+
     } else {
-        res.send(false);
+        res.json({
+            error: 'User not logged in!'
+        });
+    }
+});
+
+// Check if user is logged in
+router.delete('/pets/:id', (req, res) => {
+
+    if (req.user) {
+
+        models.UserPets.findOne({
+            where: {
+                UserId: req.user.id,
+                id: req.params.id
+            }
+        }).then((userPets) => {
+
+            userPets.destroy().then((oldData) => {
+                res.json(oldData);
+            });
+
+        })
+    } else {
+        res.json({
+            error: 'User not logged in!'
+        });
     }
 });
 

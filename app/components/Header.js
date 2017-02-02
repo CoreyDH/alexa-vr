@@ -39,7 +39,7 @@ export default class Layout extends React.Component {
 
         let userLinks = null;
 
-        console.log('login state', this.state.isLoggedIn);
+        // console.log('login state', this.state.isLoggedIn);
 
         if (this.state.isLoggedIn) {
             userLinks = (
@@ -66,9 +66,6 @@ export default class Layout extends React.Component {
                     <Navbar.Toggle />
                 </Navbar.Header>
                 <Navbar.Collapse>
-                    <Nav>
-                        <LinkContainer to="about"><NavItem>About</NavItem></LinkContainer>
-                    </Nav>
                     {userLinks}
                 </Navbar.Collapse>
             </Navbar>

@@ -7,6 +7,15 @@ import UserStore from '../stores/UserStore';
 
 export default class Layout extends React.Component {
 
+    constructor() {
+        super()
+
+        const token = UserStore.getToken();
+        if(token && !UserStore.isAuthenticated()) {
+            UserActions.logInWithToken(token);
+        }
+    }
+
     render() {
         if (this.props.children.props.route.name === 'aframe') {
             return (

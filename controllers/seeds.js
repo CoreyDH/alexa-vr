@@ -108,9 +108,7 @@ router.get('/moves', (req, res) => {
   ]
 
   models.Moves.bulkCreate(data).then((created) => {
-    console.log(created);
     if (created) {
-      console.log(created);
       res.json(created);
     } else {
       res.send('Failed creating seeds.');

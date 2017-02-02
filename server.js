@@ -6,7 +6,6 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   logger = require('morgan'),
   session = require('express-session'),
-  flash = require('connect-flash'),
   SequelizeStore = require('connect-session-sequelize')(session.Store),
   passport = require('passport'),
 
@@ -85,15 +84,6 @@ if (process.env.AMAZON_CLIENT_ID) {
   ));
 
 }
-
-// Connect Flash
-app.use(flash());
-
-// app.use(function(req, res, next) {
-//   res.locals.success_msg = req.flash('success_msg');
-//   res.locals.error_msg = req.flash('error_msg');
-//   res.locals.error = req.flash('error');
-// });
 
 // Passport init
 app.use(passport.initialize());

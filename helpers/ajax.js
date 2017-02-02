@@ -25,6 +25,14 @@ module.exports = {
             console.log('Error logging out', err);
         });
     },
+    logInWithToken: function(token) {
+        return axios.post('/account/check-token', { token: token }).then(function(res) {
+            return res.data;
+        })
+        .catch(function (err) {
+            console.log('Error logging out', err);
+        });
+    },
     logOut: function() {
         return axios.get('/account/logout').then(function(res) {
             return res.data;
@@ -50,7 +58,8 @@ module.exports = {
         });
     },
     removePet: function(id) {
-        return axios.delete('/account/pets', { id: id }).then(function(res) {
+        console.log('hit remove helper', id);
+        return axios.delete('/account/pets/'+id).then(function(res) {
             return res.data;
         })
         .catch(function (err) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { hashHistory } from 'react-router';
 
 import * as UserActions from '../actions/UserActions';
 import UserStore from "../stores/UserStore";
@@ -19,11 +20,29 @@ socket.on('news', function (data) {
 
 export default class Aframe extends React.Component {
 
+    constructor() {
+        super();
+
+        this.redirectAccount();
+    }
+
+    componentWillMount() {
+        UserStore.on('session', this.redirectAccount);
+    }
+
+    componentWillUnmount() {
+        UserStore.removeListener('session', this.redirectAccount);
+    }
+
+    redirectAccount() {
+        if(!UserStore.isAuthenticated()) {
+            hashHistory.push('/login');
+        }
+    }
+
     render() {
 
         console.log(this.props);
-
-        this.someFunction.bind(this)
 
         return (
             <Scene>

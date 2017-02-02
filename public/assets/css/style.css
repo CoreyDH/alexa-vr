@@ -48,3 +48,53 @@
     vertical-align: top;
     margin-top:20px;
 }
+
+/*Pet Cards*/
+.user-pet-holder ul {
+    list-style: none;
+}
+.pet-card {
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: rgba(0,0,0,0.1);
+    transition: all 0.5s;
+}
+
+.pet-card:hover {
+    background-color: rgba(85, 120, 179, 0.22);
+}
+
+.pet-card:after {
+    content: "";
+    clear: both;
+}
+
+.pet-card ul {
+    list-style: none;
+}
+
+.pet-name {
+    margin-top: 0;
+    padding-left: 5px;
+    padding-bottom: 10px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(33,33,33,0.5);
+    text-transform: uppercase;
+}
+
+.pet-stats {
+    background-color: rgba(0,0,0,0.1);
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.pet-remove {
+    cursor: pointer;
+    float: right;
+    color: #333;
+}
+
+.pet-remove:hover {
+    text-decoration: none;
+}
+

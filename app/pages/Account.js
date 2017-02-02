@@ -12,9 +12,10 @@ export default class Account extends React.Component {
     constructor() {
         super();
 
+        this.redirectAccount();
+
         this.state = {
-            userPets: UserActions.getPets(),
-            authenticated: UserStore.isAuthenticated(),
+            userPets: false,
             addPet: {
                 name: null,
                 type: 'Alexa'
@@ -23,67 +24,58 @@ export default class Account extends React.Component {
 
         this.getPets = this.getPets.bind(this);
 
-        console.log('state for account', this.state);
+        // console.log('state for account', this.state);
     }
 
     componentWillMount() {
         UserStore.on('petChange', this.getPets);
-        UserStore.on('session', this.getPets);
-        UserStore.getPets();
+        UserStore.on('session', this.redirectAccount);
+        UserActions.getPets();
     }
 
     componentWillUnmount() {
         UserStore.removeListener('petChange', this.getPets);
-        UserStore.removeListener('session', this.getPets);
+        UserStore.removeListener('session', this.redirectAccount);
     }
 
     redirectAccount() {
-        this.setState({
-            authenticated: UserStore.isAuthenticated()
-        })
+        if(!UserStore.isAuthenticated()) {
+            hashHistory.push('/login');
+        }
     }
 
     getPets() {
-        console.log('emitted change received for pets');
+        // console.log('emitted change received for pets');
         this.setState({
             userPets: UserStore.getPets()
         });
     }
 
-    removePet(id) {
-        UserActions.removePet(id);
-    }
-
     handleChange(event) {
-        let fieldName = event.target.name;
-        let fleldVal = event.target.value;
-        this.setState({ addPet: { ...this.state.addPet, [fieldName]: fleldVal } });
+        this.setState({ 
+            addPet: {
+                name: event.target.value,
+                type: 'Alexa'
+            } 
+        });
     }
 
     handleSubmit(event) {
         event.preventDefault();
-
         UserActions.addPet(this.state.addPet);
     }
 
 
     render() {
-
-        if (!this.state.authenticated) {
-            hashHistory.push('/login');
-        }
-
         const { userPets } = this.state;
-
-        console.log(userPets);
 
         const displayPets = Array.isArray(userPets) ? (userPets.length > 0 ? true : false) : false;
         let petHTML = '';
 
-        console.log('user pets: ', userPets, 'display?', displayPets);
+        // console.log('user pets: ', userPets, 'display?', displayPets);
         if (displayPets) {
 
-            const PetList = userPets.map((pet, i) => <Pets key={i} index={i} user={this.state.authenticated} userPet={pet} removePet={this.removePet.bind(this)} />);
+            const PetList = userPets.map((pet, i) => <Pets key={i} index={i} user={this.state.authenticated} userPet={pet} />);
 
             petHTML = (
                 <ul>
@@ -98,14 +90,14 @@ export default class Account extends React.Component {
         }
 
         return (
-            <div className="user-pet-holder">
-                <div className="col-xs-12 col-sm-8">
+            <div className="col-xs-12">
+                <div className="user-pet-holder col-xs-12 col-sm-8">
                     {petHTML}
                 </div>
                 <div className="user-pet-addPet col-xs-4 col-sm-4">
                     <Form inline onSubmit={this.handleSubmit.bind(this)}>
                         <FormGroup controlId="formInlineName">
-                            <FormControl type="text" value={this.state.addPet.name} onChange={this.handleChange.bind(this)} placeholder="Enter Pet Name Here" />
+                            <FormControl type="text" defaultValue={this.state.addPet.name} onChange={this.handleChange.bind(this)} placeholder="Enter Pet Name Here" />
                         </FormGroup>
                         <Button bsStyle="success" type="submit">Add New Pet</Button>
                     </Form>

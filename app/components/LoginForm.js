@@ -1,4 +1,5 @@
 import React from 'react';
+import { hashHistory } from 'react-router';
 import { FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap';
 
 import * as UserActions from '../actions/UserActions';
@@ -16,6 +17,33 @@ export default class LoginForm extends React.Component {
                 password: ''
             }
         }
+
+        this.getErrors = this.getErrors.bind(this);
+    }
+
+    componentWillMount() {
+        UserStore.on('session', this.isLoggedIn);
+        UserStore.on('formError', this.getErrors);
+    }
+
+    componentWillUnmount() {
+        UserStore.removeListener('session', this.isLoggedIn);
+        UserStore.removeListener('formError', this.getErrors);
+    }
+
+    getErrors() {
+        // console.log(UserStore.getFormErrors());
+        this.setState({
+            errors: UserStore.getFormErrors()
+        });
+    }
+
+    isLoggedIn() {
+
+        // console.log('logging in...', UserStore.isAuthenticated());
+        if (UserStore.isAuthenticated()) {
+            hashHistory.push('/account');
+        }
     }
 
     handleChange(event) {
@@ -26,14 +54,24 @@ export default class LoginForm extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        console.log(this.state.form);
+        // console.log(this.state.form);
 
         UserActions.logIn(this.state.form);
     }
 
     render() {
+
+        let errors = null;
+
+        if(this.state.errors) {
+            errors = (
+                <div className="alert alert-warning alert-dismissable">{this.state.errors}</div>
+            );
+        }
+
         return (
             <form onSubmit={this.handleSubmit.bind(this)}>
+                {errors}
                 <FormGroup controlId="username">
                     <ControlLabel>Username: </ControlLabel>
                     <FormControl type="text" name="username" defaultValue={this.state.form.username} onChange={this.handleChange.bind(this)} placeholder="Create a username."></FormControl>

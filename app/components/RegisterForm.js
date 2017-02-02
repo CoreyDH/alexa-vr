@@ -24,23 +24,23 @@ export default class RegisterForm extends React.Component {
     }
 
     componentWillMount() {
-        UserStore.on('session', this.isLoggedIn);
+        UserStore.on('session', this.redirectOnLogin);
         UserStore.on('formError', this.getErrors);
     }
 
     componentWillUnmount() {
-        UserStore.removeListener('session', this.isLoggedIn);
+        UserStore.removeListener('session', this.redirectOnLogin);
         UserStore.removeListener('formError', this.getErrors);
     }
 
     getErrors() {
-        console.log(UserStore.getFormErrors());
+        // console.log(UserStore.getFormErrors());
         this.setState({
             errors: UserStore.getFormErrors()
         });
     }
 
-    isLoggedIn() {
+    redirectOnLogin() {
         if (UserStore.isAuthenticated()) {
             hashHistory.push('/account');
         }
@@ -54,7 +54,7 @@ export default class RegisterForm extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        console.log(this.state.form);
+        // console.log(this.state.form);
 
         UserActions.register(this.state.form);
     }
