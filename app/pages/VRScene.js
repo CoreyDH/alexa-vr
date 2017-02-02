@@ -271,16 +271,52 @@ export default class VRScene extends React.Component {
     render() {
         return (
             <Scene>
-                {/* Skybox */}
-                <a-sky
+                {/* Background */}
+                <Sky
                     id="sky"
-                    color="#F0FEFE"
+                    src="/assets/img/milky-way.jpg"
                 />
                 <Entity
                     id="ground"
                     geometry={{primitive: 'plane', width: 100, height: 100}}
-                    material="color: #55BB88"
+                    material={{ src: '/assets/img/dirt.jpg' }}
                     position="0 0 -4"
+                    rotation="-90 0 0"
+                />
+                <Entity
+                    id="outer_ring"
+                    geometry={
+                    {
+                        primitive: 'ring',
+                        radiusInner: 5.5,
+                        radiusOuter: 6
+                    }}
+                    material="color: white"
+                    position="0 0.01 -3.68"
+                    rotation="-90 0 0"
+                />
+                <Entity
+                    id="mid_ring"
+                    geometry={
+                    {
+                        primitive: 'ring',
+                        radiusInner: 3,
+                        radiusOuter: 5.5
+                    }}
+                    material="color: #C10000"
+                    position="0 0.01 -3.68"
+                    rotation="-90 0 0"
+                />
+                <Entity
+                    id="inner_ring"
+                    geometry={
+                    {
+                        primitive: 'ring',
+                        radiusInner: 2.5,
+                        radiusOuter: 3
+                    }}
+                    material="color: white"
+                    position="0 0.01 -3.68"
                     rotation="-90 0 0"
                 />
                 
@@ -626,7 +662,7 @@ export default class VRScene extends React.Component {
                  <Text
                     id="move_ins"
                     text="Say: 'use <move>'"
-                    color="black"
+                    color="#DADADA"
                     position="-0.55 2.67 -2.51"
                     scale="0.75 0.75 0.75"
                 />
