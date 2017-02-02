@@ -53,7 +53,7 @@ export default class RegisterForm extends React.Component {
     }
 
     handleSubmit(event) {
-        event.preventDefault();
+        // event.preventDefault();
         // console.log(this.state.form);
 
         UserActions.register(this.state.form);
