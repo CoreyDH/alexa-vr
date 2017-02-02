@@ -42,7 +42,7 @@ export default class RegisterForm extends React.Component {
 
     redirectOnLogin() {
         if (UserStore.isAuthenticated()) {
-            location.reload();
+            // location.reload();
         }
     }
 
