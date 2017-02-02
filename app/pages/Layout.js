@@ -17,7 +17,7 @@ export default class Layout extends React.Component {
     }
 
     render() {
-        if (this.props.children.props.route.name === 'vrscene') {
+        if (this.props.children.props.route.name === 'aframe') {
             return (
                 <div className="a-frame">
                     <Header fixedTop={true} />

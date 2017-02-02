@@ -144,11 +144,21 @@ export default class VRScene extends React.Component {
     }
     
     componentWillMount() {
+        let petName = 'Alexa';
+        
         isLocked = false;
         gameOver = false;
 
+        // Get pet name
+        const urlArr  = window.location.href.split('/'),
+              userNum = urlArr[urlArr.length - 1];
+
+        axios.get(`/account/pet/${userNum}`).then(res => {
+            if (res.data) petName = res.data.name;
+        })
         // Get pet data and set state
-        axios.get('/pets').then(res => {
+        .then(axios.get('/pets').then(res => {
+            res.data[1].name  = petName;
             res.data[1].hpMax = res.data[1].hp;
             res.data[0].hpMax = res.data[0].hp;
             
@@ -163,7 +173,7 @@ export default class VRScene extends React.Component {
             setTimeout(() => {
                 if (!isLocked) this.setState({ battleText: '' })
             }, TEXT_DELAY);
-        });
+        }));
            
         // On player attack
         socket.on('attack', data => {
