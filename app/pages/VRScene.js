@@ -148,7 +148,13 @@ const gameAnim = {
     endText: function (show) {
         const text = document.getElementById('end_text');
 
-        text.emit(show ? 'show' : 'hide');
+        setTimeout(() => {
+            text.emit(show ? 'show' : 'hide');
+            document.getElementById('move1_text').emit(!show ? 'show' : 'hide');
+            document.getElementById('move2_text').emit(!show ? 'show' : 'hide');
+            document.getElementById('move3_text').emit(!show ? 'show' : 'hide');
+            document.getElementById('move4_text').emit(!show ? 'show' : 'hide');
+        }, 800);
         console.log('Game ended.');
     },
 
@@ -288,23 +294,23 @@ export default class VRScene extends React.Component {
                         height: 1.0
                     }}
                     material="color: #222222"
-                    position="2.08 0.75 -2.87"
+                    position="1.12 0.75 -3.21"
                 >
                     {/* Tackle animation */}
                     <a-animation
                         attribute="position"
-                        dur="100"
+                        dur="300"
                         fill="forward"
-                        to="1.55 0.75 -3"
-                        easing="linear"
+                        to="-0.86 0.75 -4.14"
+                        easing="ease-in-cubic"
                         begin="tackle"
                     />
                     <a-animation
                         attribute="position"
-                        delay="101"
-                        dur="100"
+                        delay="350"
+                        dur="200"
                         fill="forward"
-                        to="2.08 0.75 -2.87"
+                        to="1.12 0.75 -3.21"
                         easing="linear"
                         begin="tackle_end"
                     />
@@ -312,8 +318,8 @@ export default class VRScene extends React.Component {
                 <Text
                     id="player_name"
                     text={`${this.state.player.name}: ${this.state.player.hp} / ${this.state.player.hpMax}`}
-                    color="#DADADA"
-                    position="1.20 0.06 -2.51"
+                    color="black"
+                    position="0.29 0.25 -2.51"
                 />
                 <Entity
                     id="player_hpBar"
@@ -325,7 +331,7 @@ export default class VRScene extends React.Component {
                         depth: 0.01
                     }}
                     material={`color: ${game.hpColor(this.state, true)}; shader: flat`}
-                    position={`${0.93 + (game.hpWidth(this.state, true) / 2)} 0.04 -2.3`}
+                    position={`${0.06 + (game.hpWidth(this.state, true) / 2)} 0.24 -2.3`}
                     visible={game.hpWidth(this.state, true) > 0}
                 />
                 <Entity
@@ -338,33 +344,33 @@ export default class VRScene extends React.Component {
                         depth: 0.01
                     }}
                     material="color: #AAFFFF; shader: flat"
-                    position="1.73 0.04 -2.31"
+                    position="0.86 0.24 -2.31"
                 />
 
 
                 {/* Pikachu */}
                 <Entity
                     id="cpu"
-                    position="-6.23 0.00 -7.80"
+                    position="-1.78 0.00 -4.72"
                     rotation="5.16 66.5 1.72"
-                    scale=".05 .05 .05"
+                    scale=".04 .04 .04"
                     object-model="src: url(/assets/obj/pikachu/pikachu.json)"
                 >
                     {/* Tackle animation */}
                     <a-animation
                         attribute="position"
-                        dur="100"
+                        dur="300"
                         fill="forward"
-                        to="-5.71 0.00 -7.54"
-                        easing="linear"
+                        to="0.12 0.00 -4.08"
+                        easing="ease-in-cubic"
                         begin="tackle"
                     />
                     <a-animation
                         attribute="position"
-                        delay="101"
-                        dur="100"
+                        delay="350"
+                        dur="200"
                         fill="forward"
-                        to="-6.23 0.00 -7.80"
+                        to="-1.78 0.00 -4.72"
                         easing="linear"
                         begin="tackle_end"
                     />
@@ -398,8 +404,8 @@ export default class VRScene extends React.Component {
                 <Text
                     id="cpu_name"
                     text={`${this.state.cpu.name}`}
-                    color="#DADADA"
-                    position="-2.31 0.84 -2.51"
+                    color="black"
+                    position="-1.50 0.49 -2.51"
                     scale="1.00 1.00 1.00"
                 />
                 <Entity
@@ -412,7 +418,7 @@ export default class VRScene extends React.Component {
                         depth: 0.01
                     }}
                     material={`color: ${game.hpColor(this.state, false)}; shader: flat`}
-                    position={`${-2.64 + (game.hpWidth(this.state, false) / 2)} 0.77 -2.3`}
+                    position={`${-1.87 + (game.hpWidth(this.state, false) / 2)} 0.47 -2.3`}
                     visible={game.hpWidth(this.state, false) > 0}
                 />
                 <Entity
@@ -425,7 +431,7 @@ export default class VRScene extends React.Component {
                         depth: 0.01
                     }}
                     material="color: #AAFFFF; shader: flat"
-                    position="-1.84 0.77 -2.31"
+                    position="-1.07 0.47 -2.31"
                 />
 
 
@@ -433,9 +439,9 @@ export default class VRScene extends React.Component {
                 <Text
                     id="battle_text"
                     text={this.state.battleText}
-                    color="#DADADA"
-                    position="-2.96 0.12 -2.51"
-                    scale="1.00 1.00 1.00"
+                    color="black"
+                    position="-1.33 0.58 -1.47"
+                    scale="0.60 0.60 0.60"
                 />
 
 
@@ -449,7 +455,7 @@ export default class VRScene extends React.Component {
                     id="spot_light"
                     primitive="a-light"
                     light="type: spot; intensity: 1.1; penumbra: 0.8"
-                    position="9 16.5 2"
+                    position="2.54 12.11 -0.57"
                     rotation="-79 49 0"
                 >
                     <a-animation
@@ -480,7 +486,7 @@ export default class VRScene extends React.Component {
                         radiusOuter: 0.36
                     }}
                     material="color: #AAFFFF; shader: flat"
-                    position="1.7 1.15 -3.13"
+                    position="0.82 1.15 -3.44"
                     rotation="0 59 0"
                     visible="false"
                 >
@@ -510,7 +516,7 @@ export default class VRScene extends React.Component {
                         radiusOuter: 0.52
                     }}
                     material="color: #AAFFFF; shader: flat"
-                    position="1.53 1.15 -3.22"
+                    position="0.67 1.15 -3.57"
                     rotation="0 59 0"
                     visible="false"
                 >
@@ -540,7 +546,7 @@ export default class VRScene extends React.Component {
                         radiusOuter: 0.68
                     }}
                     material="color: #AAFFFF; shader: flat"
-                    position="1.32 1.15 -3.35"
+                    position="0.44 1.15 -3.75"
                     rotation="0 59 0"
                     visible="false"
                 >
@@ -573,14 +579,14 @@ export default class VRScene extends React.Component {
                         depth: 1
                     }}
                     material="color: brown"
-                    position="-6 -2 -7.87"
+                    position="-1.55 -2 -4.62"
                 >
                     <a-animation
                         attribute="position"
                         dur="1500"
                         fill="forwards"
-                        from="-6 11 -7.87"
-                        to="-6 1.8 -7.87"
+                        from="-1.55 11 -4.62"
+                        to="-1.55 1.5 -4.62"
                         easing="ease-in-quint"
                         begin="orderPackage"
                     />
@@ -601,7 +607,7 @@ export default class VRScene extends React.Component {
                 <Entity
                     id="bolt"
                     obj-model="obj: url(/assets/obj/bolt/bolt.obj); mtl: url(/assets/obj/bolt/bolt.obj.mtl)"
-                    position="2.24 1.78 -3.53"
+                    position="1.34 2.06 -4.01"
                     rotation="87.1 0 0"
                     scale="0.06 0.06 0.06"
                     visible="false"
@@ -620,8 +626,8 @@ export default class VRScene extends React.Component {
                  <Text
                     id="move_ins"
                     text="Say: 'use <move>'"
-                    color="#DADADA"
-                    position="1.15 3.30 -2.51"
+                    color="black"
+                    position="-0.55 2.67 -2.51"
                     scale="0.75 0.75 0.75"
                 />
                 <Entity
@@ -633,14 +639,14 @@ export default class VRScene extends React.Component {
                         height: 0.56,
                         depth: 0.01
                     }}
-                    material={`color: #b9d3e6; shader: flat`}
-                    position="1.84 3.00 -2.64"
+                    material={`color: #3C5659; shader: flat`}
+                    position="0.00 2.36 -2.64"
                 />
                 <Text
                     id="move1_text"
                     text={this.state.player.move1.name}
                     color="#DADADA"
-                    position="0.69 3.00 -2.51"
+                    position="-1.06 2.39 -2.51"
                     scale="1.00 1.00 1.00"
                 >
                     <a-animation
@@ -664,7 +670,7 @@ export default class VRScene extends React.Component {
                     id="move2_text"
                     text={this.state.player.move2.name}
                     color="#DADADA"
-                    position="1.92 3.00 -2.51"
+                    position="0.16 2.39 -2.51"
                     scale="1.00 1.00 1.00"
                 >
                     <a-animation
@@ -688,7 +694,7 @@ export default class VRScene extends React.Component {
                     id="move3_text"
                     text={this.state.player.move3.name}
                     color="#DADADA"
-                    position="0.51 2.77 -2.51"
+                    position="-1.22 2.15 -2.51"
                     scale="1.00 1.00 1.00"
                 >
                     <a-animation
@@ -712,7 +718,7 @@ export default class VRScene extends React.Component {
                     id="move4_text"
                     text={this.state.player.move4.name}
                     color="#DADADA"
-                    position="1.77 2.77 -2.51"
+                    position="0.01 2.15 -2.51"
                     scale="1.00 1.00 1.00"
                 >
                     <a-animation
@@ -741,7 +747,7 @@ export default class VRScene extends React.Component {
                         Say 'restart' to play again.`
                     }
                     color="red"
-                    position="-1.22 1.89 -2.51"
+                    position="-1.31 2.18 -2.51"
                     scale="1.00 1.00 1.00"
                     visible="false"
                 >
@@ -763,7 +769,6 @@ export default class VRScene extends React.Component {
                         begin="hide"
                     />
                 </Text>
-
             </Scene>
         );
     }

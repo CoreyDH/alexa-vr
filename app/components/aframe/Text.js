@@ -7,6 +7,6 @@ export default props => {
   delete extraProps.text;
 
   return <Entity
-    bmfont-text={{text: props.text}} material={{color: props.color}}
+    bmfont-text={{text: props.text, color: props.color || black}} material={{color: props.color}}
     {...extraProps}/>
 };
