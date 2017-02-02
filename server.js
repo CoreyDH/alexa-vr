@@ -6,13 +6,10 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   logger = require('morgan'),
   session = require('express-session'),
-  flash = require('connect-flash'),
   SequelizeStore = require('connect-session-sequelize')(session.Store),
   passport = require('passport'),
 
   // Local dependencies
-  routes = require('./controllers/index.js'),
-  amazonRoutes = require('./controllers/amazon.js'),
   models = require('./models'),
 
   // Const vars
@@ -85,32 +82,57 @@ if (process.env.AMAZON_CLIENT_ID) {
       saveUninitialized: true
     }
   ));
-
 }
-
-// Connect Flash
-// app.use(flash());
-
-// app.use(function(req, res, next) {
-//   res.locals.success_msg = req.flash('success_msg');
-//   res.locals.error_msg = req.flash('error_msg');
-//   res.locals.error = req.flash('error');
-// });
 
 // Passport init
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Sequelize init
-// seeder(models);
+// models.sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
+// .then(function(){
+// 	return models.sequelize.sync({force:true})
+// })
 models.sequelize.sync();
 
 // Route for static content
 app.use(express.static(process.cwd() + '/public'));
 
 // Controller routes
-app.use('/', routes);
-app.use('/amazon', amazonRoutes);
+const routes = {
+      index: require('./controllers/index.js'),
+      account: require('./controllers/account.js'),
+      amazon: require('./controllers/amazon.js'),
+      pets: require('./controllers/pets.js'),
+      sockets: require('./controllers/sockets.js'),
+      seeds: require('./controllers/seeds.js')
+};
+
+app.use('/', routes.index);
+app.use('/account', routes.account);
+app.use('/amazon', routes.amazon);
+app.use('/sockets', routes.sockets);
+app.use('/pets', routes.pets);
+app.use('/seeds', routes.seeds);
+
+app.use(function(req, res, next){
+  res.status(404);
+
+  // respond with html page
+  if (req.accepts('html')) {
+    res.render('404', { url: req.url });
+    return;
+  }
+
+  // respond with json
+  if (req.accepts('json')) {
+    res.send({ error: 'Not found' });
+    return;
+  }
+
+  // default to plain-text. send()
+  res.type('txt').send('Not found');
+});
 
 // Socket.io
 io.on('connection', function (socket) {
