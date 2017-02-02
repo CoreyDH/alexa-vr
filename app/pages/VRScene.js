@@ -29,7 +29,7 @@ function toggleFullScreen() {
     cancelFullScreen.call(doc);
   }
 }
-toggleFullScreen();
+// toggleFullScreen();
 
 window.WebVRConfig = {
     BUFFER_SCALE: 1,
