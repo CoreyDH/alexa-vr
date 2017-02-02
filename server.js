@@ -82,7 +82,6 @@ if (process.env.AMAZON_CLIENT_ID) {
       saveUninitialized: true
     }
   ));
-
 }
 
 // Passport init

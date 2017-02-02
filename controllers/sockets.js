@@ -2,15 +2,21 @@
 
 // Modules
 const express = require('express'),
-  // Const vars
-  router = express.Router();
+      router  = express.Router();
 
 // Routes
-router.get('/', (req, res) => {
-  req.io.emit('news', { hello: 'world' });
-  req.io.on('my other event', function (data) {
-    console.log(data);
-  });
+router.get('/attack/:move', (req, res) => {
+  const moveName = req.params.move;
+  console.log(moveName);
+
+  req.io.emit('attack', { move: moveName });
+  res.json({ status: 'OK' });
+});
+
+router.get('/restart', (req, res) => {
+  console.log('game restart');
+
+  req.io.emit('restart', {});
   res.json({ status: 'OK' });
 });
 
