@@ -24,7 +24,7 @@ module.exports = {
         
         defender.hp - damage < 0 ? defender.hp = 0 : defender.hp -= damage;
         state.battleText =
-            `${attacker.name} uses ${move.name} and does ${damage} damage
+            `${attacker.name} uses ${move.name}.
             `;
         if (defender.hp === 0) state.battleText += `${defender.name} has fainted!`;
         if (!isPlayer) state.lastMove = move.name;

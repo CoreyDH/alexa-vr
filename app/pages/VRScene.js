@@ -119,8 +119,20 @@ const cpuAnim = {
 
 // Other animations
 const gameAnim = {
-    endGame: function () {
-        console.log('game over');
+    endText: function (show) {
+        const text = document.getElementById('end_text');
+
+        text.emit(show ? 'show' : 'hide');
+        console.log('Game ended.');
+    },
+
+    flashMove: function (move) {
+        const text = document.getElementById(move + '_text');
+
+        setTimeout(() => text.emit('hide'), 100);
+        setTimeout(() => text.emit('show'), 300);
+        setTimeout(() => text.emit('hide'), 500);
+        setTimeout(() => text.emit('show'), 700);
     }
 }
 
@@ -132,7 +144,11 @@ export default class VRScene extends React.Component {
             player: {
                 name: 'Loading',
                 hp: 0,
-                hpMax: 1
+                hpMax: 1,
+                move1: { name: 'Loading' },
+                move2: { name: 'Loading' },
+                move3: { name: 'Loading' },
+                move4: { name: 'Loading' }
             },
             cpu: {
                 name: 'Loading',
@@ -154,7 +170,7 @@ export default class VRScene extends React.Component {
               userNum = urlArr[urlArr.length - 1];
 
         axios.get(`/account/pet/${userNum}`).then(res => {
-            if (res.data) petName = res.data.name;
+            if (res.data && res.data.name) petName = res.data.name;
         })
         // Get pet data and set state
         .then(axios.get('/pets').then(res => {
@@ -184,6 +200,7 @@ export default class VRScene extends React.Component {
                 isLocked = true;
                 this.setState(game.attack(this.state, true, data.move));
                 playerAnim[data.move]();
+                gameAnim.flashMove(data.move);
 
                 if (this.state.cpu.hp > 0) {
                     // CPU attack phase
@@ -209,10 +226,13 @@ export default class VRScene extends React.Component {
     endGame() {
         isLocked = true;
         gameOver = true;
-        gameAnim.endGame();
+        gameAnim.endText(true);
 
         socket.on('restart', () => {
-            if (gameOver) this.componentWillMount();
+            if (gameOver) {
+                gameAnim.endText(false);
+                this.componentWillMount();
+            }
         });
     }
 
@@ -388,7 +408,7 @@ export default class VRScene extends React.Component {
                     id="battle_text"
                     text={this.state.battleText}
                     color="#DADADA"
-                    position="-2.96 0.12 -2.59"
+                    position="-2.96 0.12 -2.51"
                     scale="1.00 1.00 1.00"
                 />
 
@@ -568,6 +588,155 @@ export default class VRScene extends React.Component {
                         begin="flash"
                     />
                 </Entity>
+
+
+                {/* Moves */}
+                 <Text
+                    id="move_ins"
+                    text="Say: 'use <move>'"
+                    color="#DADADA"
+                    position="1.15 3.30 -2.51"
+                    scale="0.75 0.75 0.75"
+                />
+                <Entity
+                    id="move_bar"
+                    geometry={
+                    {
+                        primitive: 'box',
+                        width: 2.80,
+                        height: 0.56,
+                        depth: 0.01
+                    }}
+                    material={`color: #b9d3e6; shader: flat`}
+                    position="1.84 3.00 -2.64"
+                />
+                <Text
+                    id="move1_text"
+                    text={this.state.player.move1.name}
+                    color="#DADADA"
+                    position="0.69 3.00 -2.51"
+                    scale="1.00 1.00 1.00"
+                >
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="forward"
+                        to="true"
+                        easing="ease-quad"
+                        begin="show"
+                    />
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="forward"
+                        to="false"
+                        easing="ease-quad"
+                        begin="hide"
+                    />
+                </Text>
+                <Text
+                    id="move2_text"
+                    text={this.state.player.move2.name}
+                    color="#DADADA"
+                    position="1.92 3.00 -2.51"
+                    scale="1.00 1.00 1.00"
+                >
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="forward"
+                        to="true"
+                        easing="ease-quad"
+                        begin="show"
+                    />
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="forward"
+                        to="false"
+                        easing="ease-quad"
+                        begin="hide"
+                    />
+                </Text>
+                <Text
+                    id="move3_text"
+                    text={this.state.player.move3.name}
+                    color="#DADADA"
+                    position="0.51 2.77 -2.51"
+                    scale="1.00 1.00 1.00"
+                >
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="forward"
+                        to="true"
+                        easing="ease-quad"
+                        begin="show"
+                    />
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="forward"
+                        to="false"
+                        easing="ease-quad"
+                        begin="hide"
+                    />
+                </Text>
+                <Text
+                    id="move4_text"
+                    text={this.state.player.move4.name}
+                    color="#DADADA"
+                    position="1.77 2.77 -2.51"
+                    scale="1.00 1.00 1.00"
+                >
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="forward"
+                        to="true"
+                        easing="ease-quad"
+                        begin="show"
+                    />
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="forward"
+                        to="false"
+                        easing="ease-quad"
+                        begin="hide"
+                    />
+                </Text>
+
+                {/* End game text */}
+                <Text
+                    id="end_text"
+                    text={
+                        `${this.state.cpu.hp === 0 ? 'You win!' : 'Sorry, you lose.'}
+                        Say 'restart' to play again.`
+                    }
+                    color="red"
+                    position="-1.22 1.89 -2.51"
+                    scale="1.00 1.00 1.00"
+                    visible="false"
+                >
+                    <a-animation
+                        attribute="visible"
+                        delay="1000"
+                        dur="1"
+                        fill="forward"
+                        to="true"
+                        easing="ease-quad"
+                        begin="show"
+                    />
+                    <a-animation
+                        attribute="visible"
+                        dur="1"
+                        fill="false"
+                        to="false"
+                        easing="ease-quad"
+                        begin="hide"
+                    />
+                </Text>
 
             </Scene>
         );
