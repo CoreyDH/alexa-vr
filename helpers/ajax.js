@@ -48,5 +48,13 @@ module.exports = {
         .catch(function (err) {
             console.log('Error adding pet to user collection', err);
         });
+    },
+    removePet: function(id) {
+        return axios.delete('/account/pets', { id: id }).then(function(res) {
+            return res.data;
+        })
+        .catch(function (err) {
+            console.log('Error adding pet to user collection', err);
+        });
     }
 }

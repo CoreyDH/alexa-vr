@@ -60,8 +60,22 @@ export default class RegisterForm extends React.Component {
     }
 
     render() {
+
+        let Errors = null;
+
+        if (this.state.errors) {
+            Errors = this.state.errors.map((error, i) => {
+                return (
+                    <div className="alert alert-warning alert-dismissable">
+                        {error.msg} 
+                    </div>
+                );
+            });
+        }
+
         return (
             <form onSubmit={this.handleSubmit.bind(this)}>
+                {Errors}
                 <FormGroup controlId="username">
                     <ControlLabel>Username: </ControlLabel>
                     <FormControl type="text" name="username" defaultValue={this.state.form.username} onChange={this.handleChange.bind(this)} placeholder="Create a username."></FormControl>

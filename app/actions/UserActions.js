@@ -55,16 +55,24 @@ export function getPets() {
     });
 }
 
-export function addPet(type) {
-    ajax.addPet({
-        pet: {
-            name: 'Alexa'
-        }
-    }).then((pet) => {
+export function addPet(newPet) {
+    ajax.addPet(newPet).then((pet) => {
 
         dispatcher.dispatch({
             type: 'ADD_PET',
             newPet: pet
+        });
+
+    });
+}
+
+export function removePet(id) {
+    ajax.removePet(id).then((pet) => {
+
+        dispatcher.dispatch({
+            type: 'REMOVE_PET',
+            pet: pet,
+            id: id
         });
 
     });

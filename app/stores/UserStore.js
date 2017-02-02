@@ -20,6 +20,19 @@ class UserStore extends EventEmitter {
         return this.userPets;
     }
 
+    getUserPetIndex(id, arr) {
+
+        let arrayIndex = null;
+
+        arr.forEach((el, i) => {
+            if(el.id === id) {
+                arrayIndex = i;
+            }
+        });
+
+        return arrayIndex;
+    }
+
     getChosenPet(id) {
         return this.chosenPet.filter((el) => { return el.id === id; });
     }
@@ -78,6 +91,12 @@ class UserStore extends EventEmitter {
 
             case 'ADD_PET':
                 this.userPets.push(action.newPet);
+                this.emit('petChange');
+                break;
+
+            case 'REMOVE_PET':
+                const petIndex = this.getUserPetIndex(action.id, this.userPets);
+                this.userPets.splice(petIndex, 1);
                 this.emit('petChange');
                 break;
 

@@ -2,6 +2,9 @@ import React from 'react';
 
 import Header from "../components/Header";
 
+import * as UserActions from '../actions/UserActions';
+import UserStore from '../stores/UserStore';
+
 export default class Layout extends React.Component {
 
     render() {
