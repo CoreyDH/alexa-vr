@@ -13,10 +13,18 @@ import Sky from '../components/aframe/Sky'
 import * as game from '../../helpers/game.js'
 
 extras.loaders.registerAll();
+
+// Global constants
 const socket     = io(),
       CPU_DELAY  = 3000,
       TEXT_DELAY = 3000;
 
+// Game state vars
+let isLocked = true,
+    gameOver = true;
+
+
+// Player animations
 const playerAnim = {
     // Tackle move
     move1: function () {
@@ -69,6 +77,7 @@ const playerAnim = {
     }
 }
 
+// CPU animations
 const cpuAnim = {
     // Tackle move
     'Tackle': function () {
@@ -108,6 +117,13 @@ const cpuAnim = {
     }
 }
 
+// Other animations
+const gameAnim = {
+    endGame: function () {
+        console.log('game over');
+    }
+}
+
 export default class VRScene extends React.Component {
     constructor(props) {
         super(props);
@@ -128,7 +144,8 @@ export default class VRScene extends React.Component {
     }
     
     componentWillMount() {
-        let isLocked = false;
+        isLocked = false;
+        gameOver = false;
 
         // Get pet data and set state
         axios.get('/pets').then(res => {
@@ -143,25 +160,33 @@ export default class VRScene extends React.Component {
 
             console.log(`Player: ${this.state.player.name}, CPU: ${this.state.cpu.name}`);
 
-            setTimeout(() => this.setState({ battleText: '' }), TEXT_DELAY);
+            setTimeout(() => {
+                if (!isLocked) this.setState({ battleText: '' })
+            }, TEXT_DELAY);
         });
-
+           
         // On player attack
         socket.on('attack', data => {
             // Check if currently playing out attack
             if (!isLocked) {
                 
                 // Player attack phase
+                isLocked = true;
                 this.setState(game.attack(this.state, true, data.move));
                 playerAnim[data.move]();
-                isLocked = true;
 
-                // CPU attack phase
-                setTimeout(() => {
-                    this.setState(game.attack(this.state, false));
-                    cpuAnim[this.state.lastMove]();
-                    isLocked = false;
-                }, CPU_DELAY);
+                if (this.state.cpu.hp > 0) {
+                    // CPU attack phase
+                    setTimeout(() => {
+                        this.setState(game.attack(this.state, false));
+                        cpuAnim[this.state.lastMove]();
+
+                        if (this.state.player.hp > 0) isLocked = false;
+                        else this.endGame(); 
+
+                    }, CPU_DELAY);
+                
+                } else this.endGame();
 
                 // Clear battle text
                 setTimeout(() => {
@@ -169,7 +194,16 @@ export default class VRScene extends React.Component {
                 }, CPU_DELAY + TEXT_DELAY);
             }
         });
+    }
 
+    endGame() {
+        isLocked = true;
+        gameOver = true;
+        gameAnim.endGame();
+
+        socket.on('restart', () => {
+            if (gameOver) this.componentWillMount();
+        });
     }
 
     render() {

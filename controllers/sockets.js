@@ -13,4 +13,11 @@ router.get('/attack/:move', (req, res) => {
   res.json({ status: 'OK' });
 });
 
+router.get('/restart', (req, res) => {
+  console.log('game restart');
+
+  req.io.emit('restart', {});
+  res.json({ status: 'OK' });
+});
+
 module.exports = router;
