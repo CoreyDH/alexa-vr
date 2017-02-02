@@ -255,7 +255,7 @@ export default class VRScene extends React.Component {
                 </Entity>
                 <Text
                     id="player_name"
-                    text={`${this.state.player.name}`}
+                    text={`${this.state.player.name}: ${this.state.player.hp} / ${this.state.player.hpMax}`}
                     color="#DADADA"
                     position="1.20 0.06 -2.51"
                 />
@@ -341,12 +341,39 @@ export default class VRScene extends React.Component {
                 </Entity>
                 <Text
                     id="cpu_name"
-                    text={`${this.state.cpu.name}: ${this.state.cpu.hp} / ${this.state.cpu.hpMax}`}
+                    text={`${this.state.cpu.name}`}
                     color="#DADADA"
-                    position="-5.50 0.04 -5.53"
-                    scale="2.00 2.00 2.00"
+                    position="-2.31 0.84 -2.51"
+                    scale="1.00 1.00 1.00"
+                />
+                <Entity
+                    id="cpu_hpBar"
+                    geometry={
+                    {
+                        primitive: 'box',
+                        width: game.hpWidth(this.state, false),
+                        height: 0.05,
+                        depth: 0.01
+                    }}
+                    material={`color: ${game.hpColor(this.state, false)}; shader: flat`}
+                    position={`${-2.64 + (game.hpWidth(this.state, false) / 2)} 0.77 -2.3`}
+                    visible={game.hpWidth(this.state, false) > 0}
+                />
+                <Entity
+                    id="cpu_hpBar_box"
+                    geometry={
+                    {
+                        primitive: 'box',
+                        width: 1.68,
+                        height: 0.1,
+                        depth: 0.01
+                    }}
+                    material="color: #AAFFFF; shader: flat"
+                    position="-1.84 0.77 -2.31"
                 />
 
+
+                {/* Battle Text */}
                 <Text
                     id="battle_text"
                     text={this.state.battleText}
