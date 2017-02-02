@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { hashHistory } from 'react-router';
+import { Button, Form, FormGroup, FormControl } from 'react-bootstrap';
 
 import * as UserActions from '../actions/UserActions';
 import UserStore from '../stores/UserStore';
@@ -11,63 +12,96 @@ export default class Account extends React.Component {
     constructor() {
         super();
 
-        this.getPets = this.getPets.bind(this);
+        this.redirectAccount();
+
         this.state = {
-            userPets: UserActions.getPets()
+            userPets: false,
+            addPet: {
+                name: null,
+                type: 'Alexa'
+            }
         }
+
+        this.getPets = this.getPets.bind(this);
+
+        // console.log('state for account', this.state);
     }
 
     componentWillMount() {
         UserStore.on('petChange', this.getPets);
+        UserStore.on('session', this.redirectAccount);
+        UserActions.getPets();
     }
 
     componentWillUnmount() {
-        UserStore.removeListener('petChange', this.getPets)
+        UserStore.removeListener('petChange', this.getPets);
+        UserStore.removeListener('session', this.redirectAccount);
+    }
+
+    redirectAccount() {
+        if(!UserStore.isAuthenticated()) {
+            hashHistory.push('/login');
+        }
     }
 
     getPets() {
-
-        console.log('emitted change received for pets');
+        // console.log('emitted change received for pets');
         this.setState({
             userPets: UserStore.getPets()
         });
     }
 
-    addPet() {
-        UserActions.addPet();
+    handleChange(event) {
+        this.setState({ 
+            addPet: {
+                name: event.target.value,
+                type: 'Alexa'
+            } 
+        });
     }
 
-    render() {
+    handleSubmit(event) {
+        event.preventDefault();
+        UserActions.addPet(this.state.addPet);
+    }
 
-        const displayPets = Array.isArray(this.state.userPets) ? (this.state.userPets.length > 0 ? true : false) : false;
+
+    render() {
+        const { userPets } = this.state;
+
+        const displayPets = Array.isArray(userPets) ? (userPets.length > 0 ? true : false) : false;
         let petHTML = '';
 
-        console.log('user pets: ', this.state.userPets, 'display?', displayPets);
-
-
-
+        // console.log('user pets: ', userPets, 'display?', displayPets);
         if (displayPets) {
 
-            let PetList = this.state.userPets.map((pet, i) => <Pets key={i} userPet={pet} />);
+            const PetList = userPets.map((pet, i) => <Pets key={i} index={i} user={this.state.authenticated} userPet={pet} />);
 
             petHTML = (
-                <ul className="user-pet-holder">
+                <ul>
                     {PetList}
                 </ul>
-            )
+            );
 
         } else {
             petHTML = (
-                <div className="user-pet-holder">
-                    No pets found! <br /><br />
-                    <Button onClick={this.addPet.bind(this)}>Add Pet Alexa</Button>
-                </div>
+                <span>No pets found!</span>
             );
         }
 
         return (
-            <div>
-                {petHTML}
+            <div className="col-xs-12">
+                <div className="user-pet-holder col-xs-12 col-sm-8">
+                    {petHTML}
+                </div>
+                <div className="user-pet-addPet col-xs-4 col-sm-4">
+                    <Form inline onSubmit={this.handleSubmit.bind(this)}>
+                        <FormGroup controlId="formInlineName">
+                            <FormControl type="text" defaultValue={this.state.addPet.name} onChange={this.handleChange.bind(this)} placeholder="Enter Pet Name Here" />
+                        </FormGroup>
+                        <Button bsStyle="success" type="submit">Add New Pet</Button>
+                    </Form>
+                </div>
             </div>
         );
     }

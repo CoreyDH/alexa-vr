@@ -1,10 +1,27 @@
 import React from 'react';
-import { Link}  from 'react-router';
+import { Link, hashHistory } from 'react-router';
 import { Button } from 'react-bootstrap';
+
+import UserStore from "../stores/UserStore";
 
 import LoginForm from "../components/LoginForm";
 
 export default class Login extends React.Component {
+
+    componentWillMount() {
+        UserStore.on('session', this.redirectAccount);
+    }
+
+    componentWillUnmount() {
+        UserStore.on('session', this.redirectAccount);
+    }
+
+    redirectAccount() {
+        if (UserStore.isAuthenticated()) {
+            hashHistory.push('/account');
+        }
+    }
+
     render() {
         return (
             <div className="login-holder">
