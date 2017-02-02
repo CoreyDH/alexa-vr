@@ -19,11 +19,9 @@ export default class Layout extends React.Component {
     render() {
         if (this.props.children.props.route.name === 'aframe') {
             return (
-                <div className="a-frame">
+                <div className="a-frame" style={{position: 'absolute', height: '100%', width: '100%'}}>
                     <Header fixedTop={true} />
-                    <div className="wrapper">
-                        {this.props.children}
-                    </div>
+                    {this.props.children}
                 </div>
             );
 
