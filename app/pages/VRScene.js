@@ -154,8 +154,9 @@ const gameAnim = {
             document.getElementById('move2_text').emit(!show ? 'show' : 'hide');
             document.getElementById('move3_text').emit(!show ? 'show' : 'hide');
             document.getElementById('move4_text').emit(!show ? 'show' : 'hide');
+
+            document.getElementById('cpu').emit(show ? 'die' : 'respawn');
         }, 800);
-        console.log('Game ended.');
     },
 
     flashMove: function (move) {
@@ -435,6 +436,23 @@ export default class VRScene extends React.Component {
                         to="5.16 66.5 1.72"
                         easing="ease-cubic"
                         begin="quick_end"
+                    />
+
+                    {/* Dead animation */}
+                    <a-animation
+                        attribute="rotation"
+                        dur="400"
+                        fill="forward"
+                        to="-64.1 41.83 63.60"
+                        easing="ease-cubic"
+                        begin="die"
+                    />
+                    <a-animation
+                        attribute="rotation"
+                        dur="1"
+                        fill="forwards"
+                        to="5.16 66.5 1.72"
+                        begin="respawn"
                     />
                 </Entity>
                 <Text
