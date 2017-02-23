@@ -175,18 +175,18 @@ export default class VRScene extends React.Component {
         
         this.state = {
             player: {
-                name: 'Loading',
-                hp: 0,
-                hpMax: 1,
-                move1: { name: 'Loading' },
-                move2: { name: 'Loading' },
-                move3: { name: 'Loading' },
-                move4: { name: 'Loading' }
+                name: 'Alexa',
+                hp: 55,
+                hpMax: 55,
+                move1: { name: 'Tackle' },
+                move2: { name: 'Lights Off' },
+                move3: { name: 'Sonic Boom' },
+                move4: { name: 'Order Package' }
             },
             cpu: {
-                name: 'Loading',
-                hp: 0,
-                hpMax: 1
+                name: 'Pikachu',
+                hp: 45,
+                hpMax: 45
             },
             battleText: ''
         };
